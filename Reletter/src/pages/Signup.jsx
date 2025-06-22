@@ -23,7 +23,7 @@ const styles = {
     flexDirection: "column",
     gap: "16px",
     width: "300px",
-    height: "535px",
+    height: "600px",
     margin: "40px auto 0 auto",
   },
   inputField: {
@@ -62,6 +62,7 @@ const styles = {
 };
 
 const schema = yup.object().shape({
+  name: yup.string().required("이름은 필수 항목입니다."),
   email: yup
     .string()
     .email("유효한 이메일 형식이 아닙니다.")
@@ -77,7 +78,7 @@ const schema = yup.object().shape({
     .required("비밀번호 확인은 필수 항목입니다."),
 });
 
-const Login = () => {
+const Signup = () => {
   const navigate = useNavigate();
   const {
     register,
@@ -89,22 +90,29 @@ const Login = () => {
   });
 
   const onSubmit = async (data) => {
+    console.log("💡 fetch 요청 데이터:", data);
     try {
-      const response = await fetch("http://localhost:3000/auth/register", {
+      const response = await fetch("http://localhost:3000/users/create", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(data),
+        body: JSON.stringify({
+          email: data.email,
+          name: data.name,
+          password: data.password,
+        }),
       });
+      
+      console.log("💡 fetch 응답 상태:", response.status);
+
+      const result = await response.json();
 
       if (!response.ok) {
-        const errorData = await response.json();
-        alert(`회원가입 실패: ${errorData.message || "알 수 없는 오류"}`);
+        alert(`회원가입 실패: ${result.message}`);
         return;
       }
 
-      const result = await response.json();
       alert("회원가입 성공!");
       navigate("/login");
     } catch (error) {
@@ -122,6 +130,16 @@ const Login = () => {
       <div style={styles.SignLogTitle}>회원가입</div>
 
       <form style={styles.formContainer} onSubmit={handleSubmit(onSubmit)}>
+        <input
+          type="text"
+          placeholder="이름을 입력해주세요!"
+          {...register("name")}
+          style={styles.inputField}
+        />
+        {errors.name && (
+          <div style={styles.errorMessage}>{errors.name.message}</div>
+        )}
+
         <input
           type="email"
           placeholder="이메일을 입력해주세요!"
@@ -168,4 +186,4 @@ const Login = () => {
   );
 };
 
-export default Login;
+export default Signup;

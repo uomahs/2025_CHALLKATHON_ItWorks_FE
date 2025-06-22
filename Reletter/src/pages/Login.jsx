@@ -82,7 +82,7 @@ const Login = () => {
 
   const onSubmit = async (data) => {
     try {
-      const res = await fetch("http://localhost:3000/auth/login", {
+      const res = await fetch("http://localhost:4000/users/create", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

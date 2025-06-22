@@ -92,7 +92,7 @@ const Signup = () => {
   const onSubmit = async (data) => {
     console.log("💡 fetch 요청 데이터:", data);
     try {
-      const response = await fetch("http://localhost:3000/users/create", {
+      const response = await fetch("http://localhost:4000/users/create", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -103,7 +103,7 @@ const Signup = () => {
           password: data.password,
         }),
       });
-      
+
       console.log("💡 fetch 응답 상태:", response.status);
 
       const result = await response.json();

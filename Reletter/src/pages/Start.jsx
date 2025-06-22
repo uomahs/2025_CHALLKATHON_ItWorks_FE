@@ -11,7 +11,6 @@ const styles = {
     width: "100%",
     backgroundColor: "#fff0f6",
     color: "#9d174d",
-    padding: "0 16px",
     fontFamily: "'Noto Sans KR', sans-serif",
   },
   title: {

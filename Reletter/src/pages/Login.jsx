@@ -5,21 +5,26 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { useNavigate } from "react-router-dom";
 
 const styles = {
+  Background: {
+    backgroundColor: "#fff0f6",
+    height: "100%",
+    marginBottom: "0px",
+  },
   SignLogTitle: {
     textAlign: "center",
-    marginTop: "100px",
     color: "#9d174d",
     fontSize: "30px",
-    width: "700px",
-    fontWeight: "bold",
+    width: "100%",
+    fontWeight: "700",
+    paddingTop: "200px",
   },
   formContainer: {
     display: "flex",
     flexDirection: "column",
     gap: "16px",
-    width: "100%",
-    height: "100vh",
-    margin: "40px auto",
+    width: "300px",
+    height: "535px",
+    margin: "40px auto 0 auto",
   },
   inputField: {
     padding: "12px",
@@ -40,6 +45,19 @@ const styles = {
     border: "none",
     cursor: "pointer",
     fontWeight: "bold",
+  },
+  returnButton: {
+    justifyContent: "center",
+    width: "150px",
+    padding: "12px",
+    fontSize: "16px",
+    borderRadius: "8px",
+    backgroundColor: "white",
+    color: "#ec4899",
+    border: "none",
+    cursor: "pointer",
+    fontWeight: "bold",
+    marginLeft: "70px",
   },
 };
 
@@ -76,15 +94,19 @@ const Login = () => {
       alert("로그인 성공!");
       localStorage.setItem("accessToken", result.accessToken);
       localStorage.setItem("refreshToken", result.refreshToken);
-      navigate("/mainpage");
+      navigate("/home");
     } catch (error) {
       console.error("에러 발생:", error);
       alert("서버 오류로 로그인 실패");
     }
   };
 
+  const handleReturnClick = () => {
+    navigate("/main");
+  };
+
   return (
-    <div>
+    <div style={styles.Background}>
       <div style={styles.SignLogTitle}>로그인</div>
 
       <form style={styles.formContainer} onSubmit={handleSubmit(onSubmit)}>
@@ -110,6 +132,14 @@ const Login = () => {
 
         <button type="submit" style={styles.submitButton} disabled={!isValid}>
           로그인
+        </button>
+
+        <button
+          type="button"
+          style={styles.returnButton}
+          onClick={handleReturnClick}
+        >
+          메인화면으로
         </button>
       </form>
     </div>

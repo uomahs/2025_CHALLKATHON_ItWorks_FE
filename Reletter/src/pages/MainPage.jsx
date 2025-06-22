@@ -83,7 +83,7 @@ const MainPage = () => {
   };
 
   const handleSignupClick = () => {
-    navigate("/Signup");
+    navigate("/signup");
   };
 
   return (

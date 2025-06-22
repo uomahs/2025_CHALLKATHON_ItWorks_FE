@@ -3,6 +3,7 @@
     "@hookform/resolvers": "^5.1.1",
     "react-hook-form": "^7.58.1",
     "react-transition-group": "^4.4.5",
-    "yup": "^1.6.1"
+    "yup": "^1.6.1",
+    "proxy": "http://localhost:4000"
   }
 }

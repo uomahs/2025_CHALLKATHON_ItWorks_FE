@@ -1,4 +1,5 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 
 const styles = {
   main: {
@@ -10,8 +11,6 @@ const styles = {
     width: "100%",
     backgroundColor: "#fff0f6",
     color: "#9d174d",
-    padding: "0 16px",
-    fontFamily: "'Noto Sans KR', sans-serif",
   },
   title: {
     fontSize: "3rem",
@@ -77,6 +76,15 @@ const styles = {
 const MainPage = () => {
   const [primaryHover, setPrimaryHover] = React.useState(false);
   const [secondaryHover, setSecondaryHover] = React.useState(false);
+  const navigate = useNavigate();
+
+  const handleLoginClick = () => {
+    navigate("/login");
+  };
+
+  const handleSignupClick = () => {
+    navigate("/Signup");
+  };
 
   return (
     <div>
@@ -92,8 +100,9 @@ const MainPage = () => {
             }}
             onMouseEnter={() => setPrimaryHover(true)}
             onMouseLeave={() => setPrimaryHover(false)}
+            onClick={handleLoginClick}
           >
-            시작하기
+            로그인
           </button>
           <button
             style={{
@@ -102,8 +111,9 @@ const MainPage = () => {
             }}
             onMouseEnter={() => setSecondaryHover(true)}
             onMouseLeave={() => setSecondaryHover(false)}
+            onClick={handleSignupClick}
           >
-            둘러보기
+            회원가입
           </button>
         </div>
 

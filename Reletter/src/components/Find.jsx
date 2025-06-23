@@ -29,7 +29,7 @@ const Find = () => {
   };
 
   return (
-    <div style={{ flexGrow: 1 }}>
+    <div style={styles.wrapper}>
       <div style={styles.container}>
         <h2 style={styles.title}>🔍 친구 찾기</h2>
 
@@ -97,11 +97,21 @@ const Find = () => {
 };
 
 const styles = {
-  container: {
-    padding: "24px",
+  wrapper: {
+    display: "flex",
+    justifyContent: "center", // 가로 가운데
+    alignItems: "center",
     backgroundColor: "#fff0f6",
-    minHeight: "100vh",
+    minHeight: "750px", // 화면 전체 높이
   },
+  container: {
+    width: "720px",
+    backgroundColor: "white",
+    borderRadius: "16px",
+    padding: "32px",
+    boxShadow: "0px 4px 12px rgba(0,0,0,0.1)",
+  },
+
   title: {
     fontSize: "24px",
     color: "#9d174d",

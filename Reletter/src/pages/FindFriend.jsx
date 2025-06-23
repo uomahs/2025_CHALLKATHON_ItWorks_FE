@@ -4,10 +4,9 @@ import Find from "../components/Find";
 
 function Main() {
   return (
-    <div style={{ height: "100vh", display: "flex", flexDirection: "column" }}>
+    <div>
       <Header />
-      <div style={{ display: "flex", flex: 1 }}>
-        <Sidebar />
+      <div>
         <Find />
       </div>
     </div>

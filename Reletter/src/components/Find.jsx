@@ -1,0 +1,189 @@
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+
+const Find = () => {
+  const navigate = useNavigate();
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchResults, setSearchResults] = useState([]);
+  const [friendRequests, setFriendRequests] = useState([]);
+
+  const handleSearch = () => {
+    // 백엔드 연동 예정
+  };
+
+  const handleAddFriend = (userId) => {
+    alert(`${userId}에게 친구 신청 보냄!`);
+    // 백엔드 연동 예정
+  };
+
+  const handleAccept = (requestId) => {
+    alert(`${requestId} 친구 요청 수락!`);
+    setFriendRequests((prev) => prev.filter((req) => req.name !== requestId));
+    // 백엔드 연동 예정
+  };
+
+  const handleReject = (requestId) => {
+    alert(`${requestId} 친구 요청 거절!`);
+    setFriendRequests((prev) => prev.filter((req) => req.name !== requestId));
+    // 백엔드 연동 예정
+  };
+
+  return (
+    <div style={{ flexGrow: 1 }}>
+      <div style={styles.container}>
+        <h2 style={styles.title}>🔍 친구 찾기</h2>
+
+        <div style={styles.searchBox}>
+          <input
+            type="text"
+            placeholder="이름 또는 이메일로 검색"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            style={styles.input}
+          />
+          <button onClick={handleSearch} style={styles.button}>
+            검색
+          </button>
+        </div>
+
+        <div style={styles.section}>
+          <h3 style={styles.subtitle}>🔎 검색 결과</h3>
+          {searchResults.length === 0 ? (
+            <p style={styles.emptyText}>검색 결과가 없습니다.</p>
+          ) : (
+            searchResults.map((user) => (
+              <div key={user.id} style={styles.resultItem}>
+                <span>{user.name}</span>
+                <button
+                  onClick={() => handleAddFriend(user.name)}
+                  style={styles.subButton}
+                >
+                  친구 신청
+                </button>
+              </div>
+            ))
+          )}
+        </div>
+
+        <div style={styles.section}>
+          <h3 style={styles.subtitle}>📬 받은 친구 요청</h3>
+          {friendRequests.length === 0 ? (
+            <p style={styles.emptyText}>받은 요청이 없습니다.</p>
+          ) : (
+            friendRequests.map((req) => (
+              <div key={req.id} style={styles.resultItem}>
+                <span>{req.name}</span>
+                <div>
+                  <button
+                    onClick={() => handleAccept(req.name)}
+                    style={styles.acceptButton}
+                  >
+                    수락
+                  </button>
+                  <button
+                    onClick={() => handleReject(req.name)}
+                    style={styles.rejectButton}
+                  >
+                    거절
+                  </button>
+                </div>
+              </div>
+            ))
+          )}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const styles = {
+  container: {
+    padding: "24px",
+    backgroundColor: "#fff0f6",
+    minHeight: "100vh",
+  },
+  title: {
+    fontSize: "24px",
+    color: "#9d174d",
+    marginBottom: "20px",
+    fontWeight: "bold",
+  },
+  searchBox: {
+    display: "flex",
+    gap: "10px",
+    marginBottom: "24px",
+  },
+  input: {
+    flex: 1,
+    padding: "10px",
+    fontSize: "16px",
+    borderRadius: "8px",
+    border: "1px solid #ccc",
+  },
+  button: {
+    padding: "10px 16px",
+    backgroundColor: "#ec4899",
+    color: "white",
+    border: "none",
+    borderRadius: "8px",
+    fontWeight: "bold",
+    cursor: "pointer",
+  },
+  section: {
+    marginBottom: "32px",
+  },
+  subtitle: {
+    fontSize: "18px",
+    marginBottom: "12px",
+    color: "#d94673",
+  },
+  resultItem: {
+    backgroundColor: "white",
+    borderRadius: "8px",
+    padding: "12px",
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: "8px",
+    boxShadow: "0 2px 4px rgba(0,0,0,0.05)",
+  },
+  subButton: {
+    padding: "6px 10px",
+    fontSize: "14px",
+    backgroundColor: "#f472b6",
+    border: "none",
+    borderRadius: "6px",
+    color: "white",
+    cursor: "pointer",
+    fontWeight: "bold",
+  },
+  acceptButton: {
+    ...this?.subButton,
+    padding: "6px 10px",
+    fontSize: "14px",
+    backgroundColor: "#f472b6",
+    border: "none",
+    borderRadius: "6px",
+    color: "white",
+    cursor: "pointer",
+    fontWeight: "bold",
+    marginRight: "6px",
+  },
+  rejectButton: {
+    ...this?.subButton,
+    padding: "6px 10px",
+    fontSize: "14px",
+    backgroundColor: "#f472b6",
+    border: "none",
+    borderRadius: "6px",
+    color: "white",
+    cursor: "pointer",
+    fontWeight: "bold",
+  },
+  emptyText: {
+    color: "#6b7280",
+    fontSize: "14px",
+  },
+};
+
+export default Find;

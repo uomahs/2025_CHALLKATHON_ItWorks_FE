@@ -1,7 +1,6 @@
 import Header from "../components/Header";
 import Sidebar from "../components/Sidebar";
-import Calendar from "../components/Calendar";
-import Write from "../components/Write";
+import Find from "../components/Find";
 
 function Main() {
   return (
@@ -9,8 +8,7 @@ function Main() {
       <Header />
       <div style={{ display: "flex", flex: 1 }}>
         <Sidebar />
-        <Calendar />
-        <Write />
+        <Find />
       </div>
     </div>
   );

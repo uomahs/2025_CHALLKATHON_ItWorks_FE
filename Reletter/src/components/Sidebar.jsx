@@ -10,16 +10,12 @@ function Sidebar() {
     navigate("/Group"); // ✅ 페이지 이동으로 변경
   };
 
-  const addFriend = () => {
-    const name = prompt("새 친구 이름을 입력하세요");
-    if (name) {
-      setFriends([...friends, { id: Date.now(), name }]);
-    }
+  const handleFindClick = () => {
+    navigate("/findfriend");
   };
 
   return (
     <aside style={sidebarStyle}>
-      {/* 그룹 섹션 */}
       <h3 style={sectionTitle}>📂 그룹</h3>
       <div style={sectionListStyle}>
         {groups.length === 0 && (
@@ -28,10 +24,10 @@ function Sidebar() {
         {groups.map((group) => (
           <SidebarItem key={group.id} label={`💌 ${group.name}`} />
         ))}
-        <button onClick={addGroup} style={addButtonStyle}>+ 그룹 추가</button>
+        <button onClick={addGroup} style={addButtonStyle}>
+          + 그룹 추가
+        </button>
       </div>
-
-      {/* 친구 섹션 */}
       <h3 style={{ ...sectionTitle, marginTop: "24px" }}>👥 친구 목록</h3>
       <div style={{ ...sectionListStyle, flexGrow: 1 }}>
         {friends.length === 0 && (
@@ -40,19 +36,18 @@ function Sidebar() {
         {friends.map((friend) => (
           <SidebarItem key={friend.id} label={`🧑 ${friend.name}`} />
         ))}
-        <button onClick={addFriend} style={addButtonStyle}>+ 친구 추가</button>
+        <button onClick={handleFindClick} style={addButtonStyle}>
+          + 친구 찾기
+        </button>
       </div>
     </aside>
   );
 }
 
 function SidebarItem({ label }) {
-  return (
-    <div style={linkStyle}>{label}</div>
-  );
+  return <div style={linkStyle}>{label}</div>;
 }
 
-// 스타일 정의
 const sidebarStyle = {
   width: "220px",
   backgroundColor: "#fdf2f8",

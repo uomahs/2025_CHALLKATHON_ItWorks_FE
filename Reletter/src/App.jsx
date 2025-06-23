@@ -5,6 +5,7 @@ import Start from "../src/pages/Start";
 import Signup from "../src/pages/Signup";
 import Main from "../src/pages/Main";
 import DiaryWrite from "../src/pages/DiaryWrite";
+import Group from "../src/pages/Group";
 
 function App() {
   return (
@@ -15,8 +16,9 @@ function App() {
       <Route path="/signup" element={<Signup />} />
       <Route path="/main" element={<Main />} />
       <Route path="/newdiary" element={<DiaryWrite />} />
+      <Route path="/group" element={<Group />} />
     </Routes>
   );
 }
 
-export default App;
+export default App

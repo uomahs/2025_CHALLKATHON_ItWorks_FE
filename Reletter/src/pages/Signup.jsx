@@ -179,7 +179,7 @@ const Signup = () => {
           style={styles.returnButton}
           onClick={handleReturnClick}
         >
-          메인화면으로
+          이전 화면으로
         </button>
       </form>
     </div>

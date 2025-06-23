@@ -1,14 +1,13 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 function Sidebar() {
   const [groups, setGroups] = useState([]);
   const [friends, setFriends] = useState([]);
+  const navigate = useNavigate();
 
   const addGroup = () => {
-    const name = prompt("새 그룹 이름을 입력하세요");
-    if (name) {
-      setGroups([...groups, { id: Date.now(), name }]);
-    }
+    navigate("/Group"); // ✅ 페이지 이동으로 변경
   };
 
   const addFriend = () => {

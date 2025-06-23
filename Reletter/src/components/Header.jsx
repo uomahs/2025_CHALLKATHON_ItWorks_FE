@@ -8,6 +8,7 @@ function Header() {
       justifyContent: 'space-between',
       padding: '0 24px',
       boxShadow: '0 2px 4px rgba(0,0,0,0.05)',
+      flexShrink: 0,
     }}>
        
        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -28,7 +29,6 @@ function Header() {
         alignItems: 'center',
         gap: '12px'
       }}>
-        <button style={roundedButtonStyle}>친구추가</button>
         <button style={roundedButtonStyle}>마이페이지</button>
         <button style={roundedButtonStyle}>설정</button>
       </div>

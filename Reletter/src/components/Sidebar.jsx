@@ -1,16 +1,109 @@
+import { useState } from "react";
+
 function Sidebar() {
+  const [groups, setGroups] = useState([]);
+  const [friends, setFriends] = useState([]);
+
+  const addGroup = () => {
+    const name = prompt("새 그룹 이름을 입력하세요");
+    if (name) {
+      setGroups([...groups, { id: Date.now(), name }]);
+    }
+  };
+
+  const addFriend = () => {
+    const name = prompt("새 친구 이름을 입력하세요");
+    if (name) {
+      setFriends([...friends, { id: Date.now(), name }]);
+    }
+  };
+
   return (
-    <aside style={{
-      width: '200px',
-      backgroundColor: '#f1f3f5',
-      padding: '20px',
-    }}>
-      <ul>
-        <li>메뉴 1</li>
-        <li>메뉴 2</li>
-      </ul>
+    <aside style={sidebarStyle}>
+      {/* 그룹 섹션 */}
+      <h3 style={sectionTitle}>📂 그룹</h3>
+      <div style={sectionListStyle}>
+        {groups.length === 0 && (
+          <p style={emptyTextStyle}>아직 생성된 그룹이 없습니다.</p>
+        )}
+        {groups.map((group) => (
+          <SidebarItem key={group.id} label={`💌 ${group.name}`} />
+        ))}
+        <button onClick={addGroup} style={addButtonStyle}>+ 그룹 추가</button>
+      </div>
+
+      {/* 친구 섹션 */}
+      <h3 style={{ ...sectionTitle, marginTop: "24px" }}>👥 친구 목록</h3>
+      <div style={{ ...sectionListStyle, flexGrow: 1 }}>
+        {friends.length === 0 && (
+          <p style={emptyTextStyle}>아직 추가된 친구가 없습니다.</p>
+        )}
+        {friends.map((friend) => (
+          <SidebarItem key={friend.id} label={`🧑 ${friend.name}`} />
+        ))}
+        <button onClick={addFriend} style={addButtonStyle}>+ 친구 추가</button>
+      </div>
     </aside>
   );
 }
+
+function SidebarItem({ label }) {
+  return (
+    <div style={linkStyle}>{label}</div>
+  );
+}
+
+// 스타일 정의
+const sidebarStyle = {
+  width: "220px",
+  backgroundColor: "#fdf2f8",
+  padding: "24px 16px",
+  height: "100vh",
+  display: "flex",
+  flexDirection: "column",
+  boxShadow: "2px 0 6px rgba(0, 0, 0, 0.05)",
+};
+
+const sectionTitle = {
+  fontSize: "16px",
+  color: "#9d174d",
+  marginBottom: "12px",
+};
+
+const linkStyle = {
+  textDecoration: "none",
+  color: "#374151",
+  fontSize: "15px",
+  padding: "8px 12px",
+  borderRadius: "8px",
+  transition: "background 0.2s",
+  cursor: "pointer",
+};
+
+const emptyTextStyle = {
+  fontSize: "13px",
+  color: "#999",
+  paddingLeft: "4px",
+  marginBottom: "8px",
+};
+
+const sectionListStyle = {
+  display: "flex",
+  flexDirection: "column",
+  gap: "8px",
+  paddingRight: "4px",
+};
+
+const addButtonStyle = {
+  marginTop: "8px",
+  padding: "6px 10px",
+  fontSize: "14px",
+  border: "1px solid #f9a8d4",
+  borderRadius: "8px",
+  backgroundColor: "#ffffff",
+  color: "#9d174d",
+  cursor: "pointer",
+  width: "100%",
+};
 
 export default Sidebar;

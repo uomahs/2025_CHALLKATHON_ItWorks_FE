@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react"; // ✅ 수정됨
 import { useForm } from "react-hook-form";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -9,6 +9,7 @@ const styles = {
     backgroundColor: "#fff0f6",
     height: "100%",
     marginBottom: "0px",
+    paddingBottom: "35px",
   },
   SignLogTitle: {
     textAlign: "center",
@@ -16,7 +17,7 @@ const styles = {
     fontSize: "30px",
     width: "100%",
     fontWeight: "700",
-    paddingTop: "200px",
+    paddingTop: "100px",
   },
   formContainer: {
     display: "flex",
@@ -80,14 +81,23 @@ const schema = yup.object().shape({
 
 const Signup = () => {
   const navigate = useNavigate();
+
   const {
     register,
     handleSubmit,
+    watch,
     formState: { errors, isValid },
   } = useForm({
     resolver: yupResolver(schema),
     mode: "onChange",
   });
+  const agree1 = watch("agree1");
+  const agree2 = watch("agree2");
+  const [showTerms1, setShowTerms1] = useState(false);
+  const [showTerms2, setShowTerms2] = useState(false);
+
+  const toggleTerms1 = () => setShowTerms1(!showTerms1);
+  const toggleTerms2 = () => setShowTerms2(!showTerms2);
 
   const onSubmit = async (data) => {
     console.log("💡 fetch 요청 데이터:", data);
@@ -174,6 +184,101 @@ const Signup = () => {
         {errors.passwordCheck && (
           <div style={styles.errorMessage}>{errors.passwordCheck.message}</div>
         )}
+
+        <div>
+          <label>
+            <input
+              type="checkbox"
+              {...register("agree1", { required: true })}
+            />
+            <span
+              style={{
+                marginLeft: "8px",
+                fontWeight: "bold",
+                textDecoration: "underline",
+                width: "200px",
+                color: "#9d174d",
+              }}
+            >
+              1. 서비스 이용약관 (필수)
+            </span>
+          </label>
+          <button
+            type="button"
+            onClick={toggleTerms1}
+            style={{
+              marginLeft: "12px",
+              borderRadius: "20px",
+              padding: "4px 12px",
+              border: "1px solid #ec4899",
+              backgroundColor: "#fff",
+              color: "#ec4899",
+              fontWeight: "bold",
+              cursor: "pointer",
+              fontSize: "0.8rem",
+            }}
+          >
+            {showTerms1 ? "닫기" : "자세히 보기"}
+          </button>
+          {showTerms1 && (
+            <p style={{ fontSize: "0.875rem", marginTop: "8px" }}>
+              - 본인은 본 서비스의 이용약관에 동의합니다. <br />- 서비스 제공
+              범위, 회원의 의무, 금지 행위 등 포함
+            </p>
+          )}
+          {!agree1 && (
+            <div style={styles.errorMessage}>이용약관에 동의해주세요.</div>
+          )}
+        </div>
+
+        <div style={{ width: "500px" }}>
+          <label>
+            <input
+              type="checkbox"
+              {...register("agree2", { required: true })}
+            />
+            <span
+              style={{
+                marginLeft: "8px",
+                fontWeight: "bold",
+                textDecoration: "underline",
+                width: "200px",
+                color: "#9d174d",
+              }}
+            >
+              2. 개인정보 수집 및 이용 동의 (필수)
+            </span>
+          </label>
+          <button
+            type="button"
+            onClick={toggleTerms2}
+            style={{
+              marginLeft: "12px",
+              borderRadius: "20px",
+              padding: "4px 12px",
+              border: "1px solid #ec4899",
+              backgroundColor: "#fff",
+              color: "#ec4899",
+              fontWeight: "bold",
+              cursor: "pointer",
+              fontSize: "0.8rem",
+            }}
+          >
+            {showTerms2 ? "닫기" : "자세히 보기"}
+          </button>
+          {showTerms2 && (
+            <p style={{ fontSize: "0.875rem", marginTop: "8px" }}>
+              - 수집 항목: 이름, 이메일, 비밀번호 등 <br />
+              - 이용 목적: 회원 식별, 서비스 제공, 고객 응대 <br />
+              - 보유 및 이용 기간: 회원 탈퇴 시까지 <br />
+            </p>
+          )}
+          {!agree2 && (
+            <div style={styles.errorMessage}>
+              개인정보 수집 및 이용에 동의해주세요.
+            </div>
+          )}
+        </div>
 
         <button type="submit" style={styles.submitButton} disabled={!isValid}>
           회원가입

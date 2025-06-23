@@ -16,6 +16,7 @@ function App() {
       <Route path="/signup" element={<Signup />} />
       <Route path="/main" element={<Main />} />
       <Route path="/newdiary" element={<DiaryWrite />} />
+      <Route path="/group" element={<Group />} />
     </Routes>
   );
 }

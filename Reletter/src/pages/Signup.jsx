@@ -108,15 +108,20 @@ const Signup = () => {
 
       const result = await response.json();
 
-      if (!response.ok) {
-        alert(`회원가입 실패: ${result.message}`);
+      if (response.status === 409) {
+        alert("이미 존재하는 이메일입니다.");
         return;
       }
 
-      alert("회원가입 성공!");
-      navigate("/login");
+      if (response.status === 201) {
+        alert("회원가입 성공!");
+        navigate("/login");
+        return;
+      }
+
+      alert(`회원가입 실패: ${result.message}`);
     } catch (error) {
-      console.error("에러 발생:", error);
+      console.error("❌ 에러 발생:", error);
       alert("서버 오류로 회원가입 실패");
     }
   };

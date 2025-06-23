@@ -1,10 +1,10 @@
-// src/pages/MainPage.jsx
 import Header from "../components/Header";
 import Sidebar from "../components/Sidebar";
 import Calendar from "../components/Calendar";
 
-function MainPage() {
-  return (
+function MainHome() {
+ console.log("✅ MainHome loaded");
+ return (
     <div style={{ height: "100vh", display: "flex", flexDirection: "column" }}>
       <Header />
       <div style={{ display: "flex", flex: 1 }}>
@@ -15,4 +15,4 @@ function MainPage() {
   );
 }
 
-export default MainPage;
+export default MainHome;

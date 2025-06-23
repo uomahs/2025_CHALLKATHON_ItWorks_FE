@@ -1,18 +1,16 @@
-// src/pages/MainPage.jsx
-import Header from "../components/Header";
-import Sidebar from "../components/Sidebar";
-import Calendar from "../components/Calendar";
-
-function MainPage() {
+function Sidebar() {
   return (
-    <div style={{ height: "100vh", display: "flex", flexDirection: "column" }}>
-      <Header />
-      <div style={{ display: "flex", flex: 1 }}>
-        <Sidebar />
-        <Calendar />
-      </div>
-    </div>
+    <aside style={{
+      width: '200px',
+      backgroundColor: '#f1f3f5',
+      padding: '20px',
+    }}>
+      <ul>
+        <li>메뉴 1</li>
+        <li>메뉴 2</li>
+      </ul>
+    </aside>
   );
 }
 
-export default MainPage;
+export default Sidebar;

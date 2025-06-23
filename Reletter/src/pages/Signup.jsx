@@ -127,7 +127,7 @@ const Signup = () => {
   };
 
   const handleReturnClick = () => {
-    navigate("/main");
+    navigate("/home");
   };
 
   return (

@@ -94,7 +94,7 @@ const Login = () => {
       alert("로그인 성공!");
       localStorage.setItem("accessToken", result.accessToken);
       localStorage.setItem("refreshToken", result.refreshToken);
-      navigate("/home");
+      navigate("/main");
     } catch (error) {
       console.error("에러 발생:", error);
       alert("서버 오류로 로그인 실패");
@@ -102,7 +102,7 @@ const Login = () => {
   };
 
   const handleReturnClick = () => {
-    navigate("/main");
+    navigate("/home");
   };
 
   return (

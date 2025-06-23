@@ -36,7 +36,7 @@ const Start = () => {
   const navigate = useNavigate();
 
   const handleLogoClick = () => {
-    navigate("/main");
+    navigate("/home");
   };
 
   return (

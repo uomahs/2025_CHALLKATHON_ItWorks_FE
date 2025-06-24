@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
 const Find = () => {
   const navigate = useNavigate();
@@ -7,10 +8,17 @@ const Find = () => {
   const [searchResults, setSearchResults] = useState([]);
   const [friendRequests, setFriendRequests] = useState([]);
 
-  const handleSearch = () => {
-    // 백엔드 연동 예정
+  const handleSearch = async () => {
+    try {
+      const res = await axios.get(
+        `http://localhost:4000/users/search?keyword=${searchQuery}`
+      );
+      setSearchResults(res.data);
+    } catch (err) {
+      console.error("❌ 검색 실패:", err);
+    }
   };
-
+  
   const handleAddFriend = (userId) => {
     alert(`${userId}에게 친구 신청 보냄!`);
     // 백엔드 연동 예정
@@ -52,7 +60,7 @@ const Find = () => {
             <p style={styles.emptyText}>검색 결과가 없습니다.</p>
           ) : (
             searchResults.map((user) => (
-              <div key={user.id} style={styles.resultItem}>
+              <div key={user._id} style={styles.resultItem}>
                 <span>{user.name}</span>
                 <button
                   onClick={() => handleAddFriend(user.name)}

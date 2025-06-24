@@ -22,7 +22,7 @@ const Find = () => {
 
   const handleAddFriend = async (userId) => {
     try {
-      await axios.post("http://localhost:4000/friends/request", {
+      await axios.post("http://localhost:4000/users/friends/request", {
         targetId: userId,
       });
       alert(`${userId}에게 친구 신청 보냈습니다!`);
@@ -34,7 +34,7 @@ const Find = () => {
 
   const handleAccept = async (requestId) => {
     try {
-      await axios.post("http://localhost:4000/friends/accept", {
+      await axios.post("http://localhost:4000/users/friends/accept", {
         requesterId: requestId,
       });
       alert(`${requestId} 친구 요청 수락!`);
@@ -47,7 +47,7 @@ const Find = () => {
 
   const handleReject = async (requestId) => {
     try {
-      await axios.post("http://localhost:4000/friends/reject", {
+      await axios.post("http://localhost:4000/users/friends/reject", {
         requesterId: requestId,
       });
       alert(`${requestId} 친구 요청 거절!`);

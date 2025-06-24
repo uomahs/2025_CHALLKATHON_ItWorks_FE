@@ -1,8 +1,11 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
 function Calendar() {
+  const navigate = useNavigate();
+
   const today = new Date();
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState(null);
@@ -94,7 +97,18 @@ function Calendar() {
           {dates.map((day, index) => (
             <div
               key={index}
-              onClick={() => day && setSelectedDate({ year, month, day })}
+              onClick={() => {
+                if (day) {
+                  setSelectedDate({ year, month, day });
+
+                  // 날짜 형식을 yyyy-mm-dd로 만들어서 이동
+                  const formattedDate = `${year}-${String(month + 1).padStart(
+                    2,
+                    "0"
+                  )}-${String(day).padStart(2, "0")}`;
+                  navigate(`/diary/${formattedDate}`);
+                }
+              }}
               style={{
                 padding: "12px 0",
                 backgroundColor: isToday(day) ? "#fde8ec" : "#fff",

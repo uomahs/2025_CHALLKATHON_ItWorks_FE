@@ -13,6 +13,7 @@ const Find = () => {
       const res = await axios.get(
         `http://localhost:4000/users/search?keyword=${searchQuery}`
       );
+      console.log("검색 결과: ", res.data);
       setSearchResults(res.data);
     } catch (err) {
       console.error("❌ 검색 실패:", err);

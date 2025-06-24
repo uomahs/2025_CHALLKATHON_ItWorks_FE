@@ -10,15 +10,29 @@ const Find = () => {
 
   const handleSearch = async () => {
     try {
+      const token = localStorage.getItem("accessToken");
+      if (!token) {
+        alert("로그인이 필요합니다.");
+        return;
+      }
+  
       const res = await axios.get(
-        `http://localhost:4000/users/search?keyword=${searchQuery}`
+        `http://localhost:4000/users/search?keyword=${searchQuery}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
       );
+  
       console.log("검색 결과: ", res.data);
       setSearchResults(res.data);
     } catch (err) {
       console.error("❌ 검색 실패:", err);
+      alert("검색 중 오류 발생!");
     }
   };
+  
 
   const handleAddFriend = async (userId) => {
     try {

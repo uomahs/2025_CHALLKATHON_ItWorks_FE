@@ -156,14 +156,14 @@ const styles = {
     color: "#d94673",
   },
   resultItem: {
-    backgroundColor: "white",
+    backgroundColor: "fff0f6",
     borderRadius: "8px",
     padding: "12px",
     display: "flex",
     justifyContent: "space-between",
     alignItems: "center",
     marginBottom: "8px",
-    boxShadow: "0 2px 4px rgba(0,0,0,0.05)",
+    boxShadow: "0 0 8px rgba(0, 0, 0, 0.1)",
   },
   subButton: {
     padding: "6px 10px",

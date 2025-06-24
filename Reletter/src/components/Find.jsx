@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
@@ -7,6 +7,29 @@ const Find = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState([]);
   const [friendRequests, setFriendRequests] = useState([]);
+
+  // ✅ 받은 친구 요청 불러오기
+  useEffect(() => {
+    const fetchFriendRequests = async () => {
+      try {
+        const token = localStorage.getItem("accessToken");
+        if (!token) return;
+
+        const res = await axios.get("http://localhost:4000/users/friends/requests", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        console.log("📥 받은 요청:", res.data);
+        setFriendRequests(res.data);
+      } catch (err) {
+        console.error("❌ 친구 요청 목록 가져오기 실패:", err);
+      }
+    };
+
+    fetchFriendRequests();
+  }, []);
 
   const handleSearch = async () => {
     try {
@@ -35,8 +58,7 @@ const Find = () => {
 
   const handleAddFriend = async (user) => {
     try {
-      const token = localStorage.getItem("accessToken"); // ✅ 저장된 토큰 꺼내기
-
+      const token = localStorage.getItem("accessToken");
       if (!token) {
         alert("로그인이 필요합니다.");
         return;
@@ -47,7 +69,7 @@ const Find = () => {
         { targetId: user._id },
         {
           headers: {
-            Authorization: `Bearer ${localStorage.getItem("accessToken")}`, // ✅ 인증 헤더 추가
+            Authorization: `Bearer ${token}`,
           },
         }
       );
@@ -59,43 +81,14 @@ const Find = () => {
     }
   };
 
-  const handleAccept = async (requestId) => {
+  const handleAccept = async (requesterId) => {
     try {
       const token = localStorage.getItem("accessToken");
-      if (!token) {
-        alert("로그인이 필요합니다.");
-        return;
-      }
+      if (!token) return;
 
       await axios.post(
         "http://localhost:4000/users/friends/accept",
-        { requesterId: requestId },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`, // ✅ 토큰 추가
-          },
-        }
-      );
-
-      alert(`${requestId} 친구 요청 수락!`);
-      setFriendRequests((prev) => prev.filter((req) => req.name !== requestId));
-    } catch (err) {
-      console.error("❌ 친구 수락 실패:", err);
-      alert("친구 요청 수락에 실패했습니다.");
-    }
-  };
-
-  const handleReject = async (requestId) => {
-    try {
-      const token = localStorage.getItem("accessToken");
-      if (!token) {
-        alert("로그인이 필요합니다.");
-        return;
-      }
-
-      await axios.post(
-        "http://localhost:4000/users/friends/reject",
-        { requesterId: requestId },
+        { requesterId },
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -103,8 +96,31 @@ const Find = () => {
         }
       );
 
-      alert(`${requestId} 친구 요청 거절!`);
-      setFriendRequests((prev) => prev.filter((req) => req.name !== requestId));
+      alert("친구 요청 수락!");
+      setFriendRequests((prev) => prev.filter((req) => req.requesterId !== requesterId));
+    } catch (err) {
+      console.error("❌ 친구 수락 실패:", err);
+      alert("친구 요청 수락에 실패했습니다.");
+    }
+  };
+
+  const handleReject = async (requesterId) => {
+    try {
+      const token = localStorage.getItem("accessToken");
+      if (!token) return;
+
+      await axios.post(
+        "http://localhost:4000/users/friends/reject",
+        { requesterId },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      alert("친구 요청 거절!");
+      setFriendRequests((prev) => prev.filter((req) => req.requesterId !== requesterId));
     } catch (err) {
       console.error("❌ 친구 거절 실패:", err);
       alert("친구 요청 거절에 실패했습니다.");
@@ -163,13 +179,13 @@ const Find = () => {
                 <span>{req.name}</span>
                 <div>
                   <button
-                    onClick={() => handleAccept(req.name)}
+                    onClick={() => handleAccept(req.requesterId)}
                     style={styles.acceptButton}
                   >
                     수락
                   </button>
                   <button
-                    onClick={() => handleReject(req.name)}
+                    onClick={() => handleReject(req.requesterId)}
                     style={styles.rejectButton}
                   >
                     거절
@@ -184,13 +200,24 @@ const Find = () => {
   );
 };
 
+const baseButton = {
+  padding: "6px 10px",
+  fontSize: "14px",
+  backgroundColor: "#f472b6",
+  border: "none",
+  borderRadius: "6px",
+  color: "white",
+  cursor: "pointer",
+  fontWeight: "bold",
+};
+
 const styles = {
   wrapper: {
     display: "flex",
-    justifyContent: "center", // 가로 가운데
+    justifyContent: "center",
     alignItems: "center",
     backgroundColor: "#fff0f6",
-    minHeight: "750px", // 화면 전체 높이
+    minHeight: "750px",
   },
   container: {
     width: "720px",
@@ -199,7 +226,6 @@ const styles = {
     padding: "32px",
     boxShadow: "0px 4px 12px rgba(0,0,0,0.1)",
   },
-
   title: {
     fontSize: "24px",
     color: "#9d174d",
@@ -236,7 +262,7 @@ const styles = {
     color: "#d94673",
   },
   resultItem: {
-    backgroundColor: "fff0f6",
+    backgroundColor: "#fff0f6",
     borderRadius: "8px",
     padding: "12px",
     display: "flex",
@@ -245,39 +271,12 @@ const styles = {
     marginBottom: "8px",
     boxShadow: "0 0 8px rgba(0, 0, 0, 0.1)",
   },
-  subButton: {
-    padding: "6px 10px",
-    fontSize: "14px",
-    backgroundColor: "#f472b6",
-    border: "none",
-    borderRadius: "6px",
-    color: "white",
-    cursor: "pointer",
-    fontWeight: "bold",
-  },
+  subButton: baseButton,
   acceptButton: {
-    ...this?.subButton,
-    padding: "6px 10px",
-    fontSize: "14px",
-    backgroundColor: "#f472b6",
-    border: "none",
-    borderRadius: "6px",
-    color: "white",
-    cursor: "pointer",
-    fontWeight: "bold",
+    ...baseButton,
     marginRight: "6px",
   },
-  rejectButton: {
-    ...this?.subButton,
-    padding: "6px 10px",
-    fontSize: "14px",
-    backgroundColor: "#f472b6",
-    border: "none",
-    borderRadius: "6px",
-    color: "white",
-    cursor: "pointer",
-    fontWeight: "bold",
-  },
+  rejectButton: baseButton,
   emptyText: {
     color: "#6b7280",
     fontSize: "14px",

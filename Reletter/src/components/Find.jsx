@@ -62,7 +62,12 @@ const Find = () => {
           ) : (
             searchResults.map((user) => (
               <div key={user._id} style={styles.resultItem}>
-                <span>{user.name}</span>
+                <div>
+                  <span>{user.name}</span>{" "}
+                  <span style={{ color: "#6b7280", fontSize: "14px" }}>
+                    ({user.email})
+                  </span>
+                </div>
                 <button
                   onClick={() => handleAddFriend(user.name)}
                   style={styles.subButton}

@@ -20,21 +20,42 @@ const Find = () => {
     }
   };
 
-  const handleAddFriend = (userId) => {
-    alert(`${userId}에게 친구 신청 보냄!`);
-    // 백엔드 연동 예정
+  const handleAddFriend = async (userId) => {
+    try {
+      await axios.post("http://localhost:4000/friends/request", {
+        targetId: userId,
+      });
+      alert(`${userId}에게 친구 신청 보냈습니다!`);
+    } catch (err) {
+      console.error("❌ 친구 신청 실패:", err);
+      alert("친구 신청에 실패했습니다.");
+    }
   };
 
-  const handleAccept = (requestId) => {
-    alert(`${requestId} 친구 요청 수락!`);
-    setFriendRequests((prev) => prev.filter((req) => req.name !== requestId));
-    // 백엔드 연동 예정
+  const handleAccept = async (requestId) => {
+    try {
+      await axios.post("http://localhost:4000/friends/accept", {
+        requesterId: requestId,
+      });
+      alert(`${requestId} 친구 요청 수락!`);
+      setFriendRequests((prev) => prev.filter((req) => req.name !== requestId));
+    } catch (err) {
+      console.error("❌ 친구 수락 실패:", err);
+      alert("친구 요청 수락에 실패했습니다.");
+    }
   };
 
-  const handleReject = (requestId) => {
-    alert(`${requestId} 친구 요청 거절!`);
-    setFriendRequests((prev) => prev.filter((req) => req.name !== requestId));
-    // 백엔드 연동 예정
+  const handleReject = async (requestId) => {
+    try {
+      await axios.post("http://localhost:4000/friends/reject", {
+        requesterId: requestId,
+      });
+      alert(`${requestId} 친구 요청 거절!`);
+      setFriendRequests((prev) => prev.filter((req) => req.name !== requestId));
+    } catch (err) {
+      console.error("❌ 친구 거절 실패:", err);
+      alert("친구 요청 거절에 실패했습니다.");
+    }
   };
 
   return (

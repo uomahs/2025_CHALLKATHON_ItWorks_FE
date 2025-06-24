@@ -91,9 +91,9 @@ const Login = () => {
       });
 
       const result = await res.json();
+      console.log("back: ", result);
       alert("로그인 성공!");
-      localStorage.setItem("accessToken", result.accessToken);
-      localStorage.setItem("refreshToken", result.refreshToken);
+      localStorage.setItem("accessToken", result.token);
       navigate("/main");
     } catch (error) {
       console.error("에러 발생:", error);

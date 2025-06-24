@@ -13,7 +13,7 @@ const MyPageForm = () => {
       try {
         const res = await axios.get("http://localhost:4000/users/info", {
           headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
+            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
           },
         });
         setUserInfo(res.data);
@@ -53,7 +53,7 @@ const MyPageForm = () => {
     try {
       await axios.patch("http://localhost:4000/users/update", newInfo, {
         headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
+          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
         },
       });
       setUserInfo(newInfo);

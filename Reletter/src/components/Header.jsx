@@ -5,6 +5,9 @@ function Header() {
   const handleLogoClick = () => {
     navigate("/main");
   };
+  const handleMyClick = () => {
+    navigate("/mypage");
+  };
   return (
     <header
       style={{
@@ -51,22 +54,12 @@ function Header() {
           gap: "12px",
         }}
       >
-        <button style={roundedButtonStyle}>마이페이지</button>
+        <button style={roundedButtonStyle} onClick={handleMyClick}>
+          마이페이지
+        </button>
         <button style={roundedButtonStyle}>설정</button>
       </div>
     </header>
-  );
-}
-
-function HoverButton({ label }) {
-  return (
-    <button
-      style={roundedButtonStyle}
-      onMouseOver={(e) => (e.currentTarget.style.backgroundColor = "#f472b6")}
-      onMouseOut={(e) => (e.currentTarget.style.backgroundColor = "#ffffff")}
-    >
-      {label}
-    </button>
   );
 }
 

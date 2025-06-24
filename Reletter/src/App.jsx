@@ -7,6 +7,8 @@ import Main from "../src/pages/Main";
 import DiaryWrite from "../src/pages/DiaryWrite";
 import Group from "../src/pages/Group";
 import FindFriend from "./pages/FindFriend";
+import MyPage from "./pages/MyPage";
+
 function App() {
   return (
     <Routes>
@@ -18,6 +20,7 @@ function App() {
       <Route path="/newdiary" element={<DiaryWrite />} />
       <Route path="/findfriend" element={<FindFriend />} />
       <Route path="/group" element={<Group />} />
+      <Route path="/mypage" element={<MyPage />} />
     </Routes>
   );
 }

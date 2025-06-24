@@ -57,7 +57,6 @@ function Header() {
         <button style={roundedButtonStyle} onClick={handleMyClick}>
           마이페이지
         </button>
-        <button style={roundedButtonStyle}>설정</button>
       </div>
     </header>
   );

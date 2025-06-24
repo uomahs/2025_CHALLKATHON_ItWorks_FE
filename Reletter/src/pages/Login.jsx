@@ -93,6 +93,7 @@ const Login = () => {
       const result = await res.json();
       console.log("back: ", result);
       alert("로그인 성공!");
+
       localStorage.setItem("accessToken", result.token);
       navigate("/main");
     } catch (error) {

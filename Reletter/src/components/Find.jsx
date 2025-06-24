@@ -15,11 +15,14 @@ const Find = () => {
         const token = localStorage.getItem("accessToken");
         if (!token) return;
 
-        const res = await axios.get("http://localhost:4000/users/friends/requests", {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
+        const res = await axios.get(
+          "http://localhost:4000/users/friends/requests",
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
 
         console.log("📥 받은 요청:", res.data);
         setFriendRequests(res.data);
@@ -74,7 +77,7 @@ const Find = () => {
         }
       );
 
-      alert(`${user.name} 님에게 친구 신청 보냈습니다!`);
+      alert(`${user.name} 님에게 친구 신청을 보냈습니다!`);
     } catch (err) {
       console.error("❌ 친구 신청 실패:", err);
       alert("친구 신청에 실패했습니다.");
@@ -97,7 +100,9 @@ const Find = () => {
       );
 
       alert("친구 요청 수락!");
-      setFriendRequests((prev) => prev.filter((req) => req.requesterId !== requesterId));
+      setFriendRequests((prev) =>
+        prev.filter((req) => req.requesterId !== requesterId)
+      );
     } catch (err) {
       console.error("❌ 친구 수락 실패:", err);
       alert("친구 요청 수락에 실패했습니다.");
@@ -120,7 +125,9 @@ const Find = () => {
       );
 
       alert("친구 요청 거절!");
-      setFriendRequests((prev) => prev.filter((req) => req.requesterId !== requesterId));
+      setFriendRequests((prev) =>
+        prev.filter((req) => req.requesterId !== requesterId)
+      );
     } catch (err) {
       console.error("❌ 친구 거절 실패:", err);
       alert("친구 요청 거절에 실패했습니다.");

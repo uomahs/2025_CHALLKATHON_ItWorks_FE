@@ -18,7 +18,7 @@ const Find = () => {
       console.error("❌ 검색 실패:", err);
     }
   };
-  
+
   const handleAddFriend = (userId) => {
     alert(`${userId}에게 친구 신청 보냄!`);
     // 백엔드 연동 예정

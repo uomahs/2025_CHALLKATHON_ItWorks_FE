@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -83,7 +82,7 @@ const DiaryWrite = () => {
   return (
     <div style={styles.page}>
       <button onClick={handleReturnClick} style={styles.returnBtn}>
-        ◀︎ 메인화면으로
+        ⬅️ 메인화면으로
       </button>
 
       <div style={styles.mainContainer}>

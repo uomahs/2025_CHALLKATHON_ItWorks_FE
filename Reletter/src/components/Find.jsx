@@ -183,7 +183,12 @@ const Find = () => {
           ) : (
             friendRequests.map((req) => (
               <div key={req.id} style={styles.resultItem}>
-                <span>{req.name}</span>
+                <div>
+                  <span>{req.name}</span>{" "}
+                  <span style={{ color: "#6b7280", fontSize: "14px" }}>
+                    ({req.email})
+                  </span>
+                </div>
                 <div>
                   <button
                     onClick={() => handleAccept(req.requesterId)}

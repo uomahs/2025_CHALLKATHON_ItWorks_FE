@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
 const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
@@ -9,9 +10,31 @@ function Calendar() {
   const today = new Date();
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState(null);
-
+  const [unreadSummary, setUnreadSummary] = useState({});
   const year = currentDate.getFullYear();
   const month = currentDate.getMonth();
+  useEffect(() => {
+    const fetchUnreadSummary = async () => {
+      try {
+        const token = localStorage.getItem("accessToken");
+        const res = await axios.get(
+          `http://localhost:4000/diaries/unread-summary?year=${year}&month=${String(
+            month + 1
+          ).padStart(2, "0")}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        setUnreadSummary(res.data);
+      } catch (error) {
+        console.error("❌ 읽지 않은 요약 불러오기 실패:", error);
+      }
+    };
+
+    fetchUnreadSummary();
+  }, [year, month]);
 
   const firstDay = new Date(year, month, 1).getDay();
   const lastDate = new Date(year, month + 1, 0).getDate();
@@ -94,35 +117,85 @@ function Calendar() {
             gridAutoRows: "100px",
           }}
         >
-          {dates.map((day, index) => (
-            <div
-              key={index}
-              onClick={() => {
-                if (day) {
-                  setSelectedDate({ year, month, day });
+          {dates.map((day, index) => {
+            const formattedDate = `${year}-${String(month + 1).padStart(
+              2,
+              "0"
+            )}-${String(day).padStart(2, "0")}`;
+            const unreadCount = unreadSummary[formattedDate]?.count || 0;
+            const groupCount = unreadSummary[formattedDate]?.groupCount || 0;
 
-                  // 날짜 형식을 yyyy-mm-dd로 만들어서 이동
-                  const formattedDate = `${year}-${String(month + 1).padStart(
-                    2,
-                    "0"
-                  )}-${String(day).padStart(2, "0")}`;
-                  navigate(`/diary/${formattedDate}`);
-                }
-              }}
-              style={{
-                padding: "12px 0",
-                backgroundColor: isToday(day) ? "#fde8ec" : "#fff",
-                border: isSelected(day)
-                  ? "2px solid #d94673"
-                  : "1px solid #eee",
-                borderRadius: "8px",
-                color: day ? "#333" : "transparent",
-                cursor: day ? "pointer" : "default",
-              }}
-            >
-              {day || ""}
-            </div>
-          ))}
+            return (
+              <div
+                key={index}
+                onClick={() => {
+                  if (day) {
+                    setSelectedDate({ year, month, day });
+                    navigate(`/diary/${formattedDate}`);
+                  }
+                }}
+                style={{
+                  padding: "8px",
+                  backgroundColor: isToday(day) ? "#fde8ec" : "#fff",
+                  border: isSelected(day)
+                    ? "2px solid #d94673"
+                    : "1px solid #eee",
+                  borderRadius: "8px",
+                  color: day ? "#333" : "transparent",
+                  cursor: day ? "pointer" : "default",
+                  position: "relative",
+                  display: "flex",
+                  flexDirection: "column",
+                  justifyContent: "space-between",
+                }}
+              >
+                <div style={{ fontWeight: "bold", fontSize: "16px" }}>
+                  {day || ""}
+                </div>
+
+                {day && unreadCount > 0 && (
+                  <div style={{ fontSize: "12px", color: "#d94673" }}>
+                    💌 미열람 일기 {unreadCount}개
+                  </div>
+                )}
+
+                {day && unreadCount === 0 && (
+                  <div
+                    style={{
+                      fontSize: "20px",
+                      color: "#d94673",
+                      paddingBottom: "25px",
+                    }}
+                  >
+                    🩷
+                  </div>
+                )}
+
+                {day && groupCount > 0 && (
+                  <div
+                    style={{
+                      marginTop: "4px",
+                      display: "flex",
+                      gap: "4px",
+                      justifyContent: "center",
+                    }}
+                  >
+                    {Array.from({ length: groupCount }).map((_, i) => (
+                      <div
+                        key={i}
+                        style={{
+                          width: "6px",
+                          height: "6px",
+                          borderRadius: "50%",
+                          backgroundColor: "#d94673",
+                        }}
+                      />
+                    ))}
+                  </div>
+                )}
+              </div>
+            );
+          })}
         </div>
       </div>
     </div>
@@ -152,5 +225,22 @@ function NavButton({ onClick, children }) {
     </button>
   );
 }
+const styles = {
+  readStatus: {
+    position: "absolute",
+    bottom: "6px",
+    right: "6px",
+    backgroundColor: "#f43f5e",
+    color: "#fff",
+    fontSize: "12px",
+    borderRadius: "50%",
+    width: "20px",
+    height: "20px",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    fontWeight: "bold",
+  },
+};
 
 export default Calendar;

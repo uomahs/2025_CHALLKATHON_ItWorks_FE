@@ -53,6 +53,9 @@ const Find = () => {
 
       console.log("검색 결과: ", res.data);
       setSearchResults(res.data);
+      if (res.data.length === 0) {
+        alert("존재하지 않는 친구입니다.");
+      }
     } catch (err) {
       console.error("❌ 검색 실패:", err);
       alert("검색 중 오류 발생!");

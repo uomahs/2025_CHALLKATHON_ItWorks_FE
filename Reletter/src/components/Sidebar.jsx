@@ -1,4 +1,3 @@
-// Sidebar.jsx
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -159,7 +158,7 @@ const sidebarStyle = {
 const popupStyle = {
   position: "fixed",
   top: "220px",
-  left: "220px",
+  left: "240px",
   width: "260px",
   backgroundColor: "#fff0f5",
   padding: "16px",

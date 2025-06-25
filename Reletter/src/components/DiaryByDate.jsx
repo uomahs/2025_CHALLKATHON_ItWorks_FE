@@ -29,15 +29,15 @@ const DiaryByDate = () => {
 
         const updatedGroups = await Promise.all(
           groups.map(async (group) => {
-            const diary = group.entries[0];
-            if (!diary) return group;
+            const diary = group.entries?.[0];
+            if (!diary) return null;
 
             try {
               const readRes = await axios.get(
                 `http://localhost:4000/diaries/${diary.id}/read`,
                 {
                   headers: {
-                    Authorization: `Bearer ${token}`,
+                    Authorization: `Bearer ${accessToken}`,
                   },
                 }
               );
@@ -86,6 +86,8 @@ const DiaryByDate = () => {
 
         {groupPreviews.map((group) => {
           const diary = group.entries[0];
+          if (!diary) return null; // diary가 없으면 렌더링하지 않음
+
           return (
             <div
               key={group.id}

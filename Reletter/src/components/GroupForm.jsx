@@ -4,31 +4,83 @@ function GroupForm({ onCreated }) {
   const [groupName, setGroupName] = useState("");
   const [friends, setFriends] = useState([]);
   const [selectedFriends, setSelectedFriends] = useState([]);
+  const [invitations, setInvitations] = useState([]);
 
-  // 친구 목록 불러오기
   useEffect(() => {
-    const fetchFriends = async () => {
+    const fetchData = async () => {
       try {
-        const res = await fetch("http://localhost:4000/users/friends", {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-          },
-        });
-        const data = await res.json();
-        setFriends(data);
+        const token = localStorage.getItem("accessToken");
+
+        const friendRes = await fetch(
+          "http://localhost:4000/users/friends/list",
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
+        if (!friendRes.ok) throw new Error("친구 목록 불러오기 실패");
+        const friendsData = await friendRes.json();
+        setFriends(friendsData);
+
+        const inviteRes = await fetch(
+          "http://localhost:4000/users/groups/invitations",
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
+        if (!inviteRes.ok) throw new Error("초대 목록 불러오기 실패");
+        const invitesData = await inviteRes.json();
+        setInvitations(invitesData);
       } catch (err) {
-        console.error("친구 목록 불러오기 실패:", err);
+        console.error("데이터 불러오기 실패:", err);
       }
     };
-    fetchFriends();
+
+    fetchData();
   }, []);
 
-  const toggleFriend = (friendId) => {
+  const toggleFriend = (email) => {
     setSelectedFriends((prev) =>
-      prev.includes(friendId)
-        ? prev.filter((id) => id !== friendId)
-        : [...prev, friendId]
+      prev.includes(email) ? prev.filter((e) => e !== email) : [...prev, email]
     );
+  };
+
+  // 초대 수락
+  const acceptInvite = async (groupId) => {
+    try {
+      const token = localStorage.getItem("accessToken");
+      const res = await fetch(
+        `http://localhost:4000/users/groups/${groupId}/accept`,
+        {
+          method: "POST",
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      if (!res.ok) throw new Error("초대 수락 실패");
+      alert("초대를 수락했습니다.");
+      setInvitations((prev) => prev.filter((inv) => inv.groupId !== groupId));
+    } catch (err) {
+      console.error(err);
+      alert("초대 수락 중 오류가 발생했습니다.");
+    }
+  };
+
+  const rejectInvite = async (groupId) => {
+    try {
+      const token = localStorage.getItem("accessToken");
+      const res = await fetch(
+        `http://localhost:4000/users/groups/${groupId}/reject`,
+        {
+          method: "POST",
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      if (!res.ok) throw new Error("초대 거절 실패");
+      alert("초대를 거절했습니다.");
+      setInvitations((prev) => prev.filter((inv) => inv.groupId !== groupId));
+    } catch (err) {
+      console.error(err);
+      alert("초대 거절 중 오류가 발생했습니다.");
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -37,29 +89,39 @@ function GroupForm({ onCreated }) {
     if (selectedFriends.length === 0) return alert("친구를 선택하세요.");
 
     try {
+      const token = localStorage.getItem("accessToken");
       const res = await fetch("http://localhost:4000/users/groups", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({ name: groupName }),
       });
 
+      if (!res.ok) throw new Error("그룹 생성 실패");
+
       const result = await res.json();
       const groupId = result.groupId;
 
-      await fetch(`http://localhost:4000/users/groups/${groupId}/invite`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-        },
-        body: JSON.stringify({ userIds: selectedFriends }),
-      });
+      const inviteRes = await fetch(
+        `http://localhost:4000/users/groups/${groupId}/invite`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ userEmails: selectedFriends }),
+        }
+      );
+
+      if (!inviteRes.ok) throw new Error("친구 초대 실패");
 
       alert("그룹이 생성되었습니다!");
-      onCreated(); // 부모 컴포넌트에 알림
+      setGroupName("");
+      setSelectedFriends([]);
+      onCreated();
     } catch (err) {
       console.error(err);
       alert("그룹 생성 실패");
@@ -67,55 +129,87 @@ function GroupForm({ onCreated }) {
   };
 
   return (
-    <form onSubmit={handleSubmit} style={styles.container}>
-      <h2 style={styles.title}>👥 그룹 만들기</h2>
+    <div style={styles.container}>
+      <form onSubmit={handleSubmit} style={{ marginBottom: "30px" }}>
+        <h2 style={styles.title}>👥 그룹 만들기</h2>
 
-      <label style={styles.label}>
-        그룹 이름:
-        <input
-          type="text"
-          placeholder="그룹 이름을 입력하세요"
-          value={groupName}
-          onChange={(e) => setGroupName(e.target.value)}
-          required
-          style={styles.input}
-        />
-      </label>
+        <label style={styles.label}>
+          그룹 이름:
+          <input
+            type="text"
+            placeholder="그룹 이름을 입력하세요"
+            value={groupName}
+            onChange={(e) => setGroupName(e.target.value)}
+            required
+            style={styles.input}
+          />
+        </label>
 
-      <label style={styles.label}>
-        친구 선택:
-        <div style={styles.friendList}>
-          {friends.length === 0 ? (
-            <p style={{ fontSize: "16px",
-              color: "#888",
-               margin: 0,
-               height: "50px",
-               display: "flex",
-               justifyContent: "center",
-               alignItems: "center",
-               textAlign: "center",}}>친구가 없습니다.</p>
-          ) : (
-            friends.map((friend) => (
-              <div key={friend._id} style={{ marginBottom: "6px" }}>
-                <label>
-                  <input
-                    type="checkbox"
-                    checked={selectedFriends.includes(friend._id)}
-                    onChange={() => toggleFriend(friend._id)}
-                    style={{ marginRight: "8px" }}
-                  />
-                  {friend.name} ({friend.email})
-                </label>
-              </div>
-            ))
-          )}
-        </div>
-      </label>
+        <label style={styles.label}>
+          친구 선택:
+          <div style={styles.friendList}>
+            {friends.length === 0 ? (
+              <p style={styles.noFriends}>친구가 없습니다.</p>
+            ) : (
+              friends.map((friend) => (
+                <div key={friend.email} style={{ marginBottom: "6px" }}>
+                  <label style={{ fontWeight: "normal" }}>
+                    <input
+                      type="checkbox"
+                      checked={selectedFriends.includes(friend.email)}
+                      onChange={() => toggleFriend(friend.email)}
+                      style={{ marginRight: "8px" }}
+                    />
+                    {friend.name} ({friend.email})
+                  </label>
+                </div>
+              ))
+            )}
+          </div>
+        </label>
 
-      <button type="submit" style={styles.button}>
-        그룹 생성
-      </button>
-    </form>
+        <button type="submit" style={styles.button}>
+          그룹 생성
+        </button>
+      </form>
+
+      <div>
+        <h2 style={styles.group}>📨 받은 그룹 초대</h2>
+        {invitations.length === 0 ? (
+          <p style={styles.noInvites}>받은 초대가 없습니다.</p>
+        ) : (
+          invitations.map((invite) => (
+            <div
+              key={invite.groupId}
+              style={{
+                border: "1px solid #ddd",
+                padding: "10px",
+                borderRadius: "8px",
+                marginBottom: "10px",
+                backgroundColor: "#fff",
+              }}
+            >
+              <p>
+                그룹명: <strong>{invite.groupName}</strong>
+              </p>
+              <p>초대한 사람: {invite.inviterName}</p>
+              <button
+                style={{ ...styles.smallButton, backgroundColor: "#4caf50" }}
+                onClick={() => acceptInvite(invite.groupId)}
+              >
+                수락
+              </button>
+              <button
+                style={{ ...styles.smallButton, backgroundColor: "#f44336" }}
+                onClick={() => rejectInvite(invite.groupId)}
+              >
+                거절
+              </button>
+            </div>
+          ))
+        )}
+      </div>
+    </div>
   );
 }
 
@@ -131,6 +225,12 @@ const styles = {
   title: {
     fontSize: "26px",
     fontWeight: "bold",
+    marginBottom: "20px",
+    color: "#b51b6f",
+    textAlign: "center",
+  },
+  group: {
+    fontSize: "24px",
     marginBottom: "20px",
     color: "#b51b6f",
     textAlign: "center",
@@ -160,6 +260,26 @@ const styles = {
     borderRadius: "8px",
     padding: "10px",
   },
+  noFriends: {
+    fontSize: "16px",
+    color: "#888",
+    margin: 0,
+    height: "50px",
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    textAlign: "center",
+  },
+  noInvites: {
+    fontSize: "16px",
+    color: "#888",
+    margin: 0,
+    height: "50px",
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    textAlign: "center",
+  },
   button: {
     width: "100%",
     padding: "12px",
@@ -170,7 +290,14 @@ const styles = {
     borderRadius: "8px",
     cursor: "pointer",
     fontSize: "16px",
-    marginTop: "20px",
+  },
+  smallButton: {
+    padding: "6px 12px",
+    color: "#fff",
+    border: "none",
+    borderRadius: "6px",
+    cursor: "pointer",
+    marginRight: "8px",
   },
 };
 

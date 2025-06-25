@@ -8,7 +8,7 @@ import DiaryWrite from "../src/pages/DiaryWrite";
 import Group from "../src/pages/Group";
 import FindFriend from "./pages/FindFriend";
 import MyPage from "./pages/MyPage";
-
+import DiaryDetail from "./pages/DiaryDetail";
 import Diary from "./pages/Diary";
 
 function App() {
@@ -24,6 +24,7 @@ function App() {
       <Route path="/group" element={<Group />} />
       <Route path="/mypage" element={<MyPage />} />
       <Route path="/diary/:date" element={<Diary />} />
+      <Route path="/diary/detail/:id" element={<DiaryDetail />} />
     </Routes>
   );
 }

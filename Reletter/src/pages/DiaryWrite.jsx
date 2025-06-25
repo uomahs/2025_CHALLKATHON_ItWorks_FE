@@ -143,7 +143,7 @@ const DiaryWrite = () => {
   return (
     <div style={styles.page}>
       <button onClick={handleReturnClick} style={styles.returnBtn}>
-        ⬅️ 메인화면으로
+        ⬅
       </button>
 
       <div style={styles.mainContainer}>
@@ -246,6 +246,7 @@ const styles = {
     backgroundColor: "#fff0f6",
     height: "745px",
     padding: "2rem",
+    paddingTop: "30px"
   },
   mainContainer: {
     display: "flex",
@@ -265,6 +266,7 @@ const styles = {
     backgroundColor: "white",
     padding: "2rem",
     borderRadius: "16px",
+    
     boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.2)",
   },
   title: {
@@ -335,17 +337,17 @@ const styles = {
   },
   returnBtn: {
     position: "fixed",
-    top: "30px",
+    top: "px",
     left: "30px",
     padding: "16px 24px",
     backgroundColor: "white",
     color: "#9d174d",
+    border: "2px solid #d94673",
     fontSize: "16px",
     borderRadius: "9999px",
-    border: "none",
     cursor: "pointer",
     fontWeight: "bold",
-    boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.2)",
+    boxShadow: "0px 2px 10px rgba(0, 0, 0, 0.2)",
   },
   endBtn: {
     position: "fixed",

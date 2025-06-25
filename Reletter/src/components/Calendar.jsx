@@ -6,12 +6,14 @@ const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
 function Calendar() {
   const navigate = useNavigate();
-
   const today = new Date();
+
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState(null);
+  const [hoveredIndex, setHoveredIndex] = useState(null); // ✅ hover 상태 관리
   const [unreadSummary, setUnreadSummary] = useState({});
   const [loading, setLoading] = useState(true);
+
   const year = currentDate.getFullYear();
   const month = currentDate.getMonth();
 
@@ -28,7 +30,6 @@ function Calendar() {
             },
           }
         );
-        // console.log("📦 count-by-date 응답:", res.data);
         setUnreadSummary(res.data);
       } catch (error) {
         console.error("❌ 읽지 않은 요약 불러오기 실패:", error);
@@ -53,35 +54,23 @@ function Calendar() {
     setSelectedDate(null);
   };
 
-  const isToday = (day) => {
-    return (
-      year === today.getFullYear() &&
-      month === today.getMonth() &&
-      day === today.getDate()
-    );
-  };
+  const isToday = (day) =>
+    year === today.getFullYear() &&
+    month === today.getMonth() &&
+    day === today.getDate();
 
-  const isSelected = (day) => {
-    return (
-      selectedDate &&
-      selectedDate.year === year &&
-      selectedDate.month === month &&
-      selectedDate.day === day
-    );
-  };
+  const isSelected = (day) =>
+    selectedDate &&
+    selectedDate.year === year &&
+    selectedDate.month === month &&
+    selectedDate.day === day;
 
   const dates = [];
-  for (let i = 0; i < firstDay; i++) {
-    dates.push(null);
-  }
-  for (let i = 1; i <= lastDate; i++) {
-    dates.push(i);
-  }
+  for (let i = 0; i < firstDay; i++) dates.push(null);
+  for (let i = 1; i <= lastDate; i++) dates.push(i);
 
   if (loading) {
-    return (
-      <p style={{ textAlign: "center", marginTop: "100px" }}>로딩 중...</p>
-    );
+    return <p style={{ textAlign: "center", marginTop: "100px" }}>로딩 중...</p>;
   }
 
   return (
@@ -133,8 +122,6 @@ function Calendar() {
               "0"
             )}-${String(day).padStart(2, "0")}`;
             const daySummary = unreadSummary[formattedDate];
-            const unreadCount = daySummary?.unreadCount || 0;
-            const groupCount = daySummary?.groupCount || 0;
 
             return (
               <div
@@ -145,10 +132,18 @@ function Calendar() {
                     navigate(`/diary/${formattedDate}`);
                   }
                 }}
+                onMouseEnter={() => setHoveredIndex(index)}
+                onMouseLeave={() => setHoveredIndex(null)}
                 style={{
                   padding: "8px",
-                  backgroundColor: isToday(day) ? "#fde8ec" : "#fff",
+                  backgroundColor: isToday(day)
+                    ? "#fde8ec"
+                    : hoveredIndex === index && day
+                    ? "#fde8ec"
+                    : "#fff",
                   border: isSelected(day)
+                    ? "2px solid #d94673"
+                    : hoveredIndex === index && day
                     ? "2px solid #d94673"
                     : "1px solid #eee",
                   borderRadius: "8px",
@@ -158,6 +153,13 @@ function Calendar() {
                   display: "flex",
                   flexDirection: "column",
                   justifyContent: "space-between",
+                  transform:
+                    hoveredIndex === index && day ? "translateY(-2px)" : "none",
+                  boxShadow:
+                    hoveredIndex === index && day
+                      ? "0 4px 8px rgba(217, 70, 115, 0.1)"
+                      : "none",
+                  transition: "all 0.2s ease-in-out",
                 }}
               >
                 <div style={{ fontWeight: "bold", fontSize: "16px" }}>
@@ -202,7 +204,7 @@ function Calendar() {
                       paddingBottom: "25px",
                     }}
                   >
-                    ✍️ 일기 없음
+                    일기 없음
                   </div>
                 )}
               </div>
@@ -237,23 +239,5 @@ function NavButton({ onClick, children }) {
     </button>
   );
 }
-
-const styles = {
-  readStatus: {
-    position: "absolute",
-    bottom: "6px",
-    right: "6px",
-    backgroundColor: "#f43f5e",
-    color: "#fff",
-    fontSize: "12px",
-    borderRadius: "50%",
-    width: "20px",
-    height: "20px",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    fontWeight: "bold",
-  },
-};
 
 export default Calendar;

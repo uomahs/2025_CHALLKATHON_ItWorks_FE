@@ -5,6 +5,7 @@ const DiaryComments = ({ diaryId }) => {
   const [comments, setComments] = useState([]);
   const [commentInput, setCommentInput] = useState("");
 
+  // fetchComments 함수는 한 번만 정의
   const fetchComments = async () => {
     try {
       const token = localStorage.getItem("accessToken");
@@ -14,11 +15,16 @@ const DiaryComments = ({ diaryId }) => {
           headers: { Authorization: `Bearer ${token}` },
         }
       );
+      console.log("댓글 응답:", res.data);  // 디버깅용
       setComments(res.data);
     } catch (err) {
       console.error("댓글 불러오기 실패:", err);
     }
   };
+
+  useEffect(() => {
+    fetchComments();
+  }, [diaryId]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -34,15 +40,11 @@ const DiaryComments = ({ diaryId }) => {
         }
       );
       setCommentInput("");
-      fetchComments();
+      fetchComments(); // 등록 후 댓글 다시 불러오기
     } catch (err) {
       console.error("댓글 등록 실패:", err);
     }
   };
-
-  useEffect(() => {
-    fetchComments();
-  }, [diaryId]);
 
   return (
     <div style={{ marginTop: "16px" }}>

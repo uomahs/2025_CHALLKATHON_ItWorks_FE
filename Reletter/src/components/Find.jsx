@@ -7,49 +7,30 @@ const Find = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState([]);
   const [friendRequests, setFriendRequests] = useState([]);
-  const [friends, setFriends] = useState([]); // ✅ 친구 목록 상태
-
-  // ✅ 친구 목록 불러오기
-  const fetchFriends = async () => {
-    try {
-      const token = localStorage.getItem("accessToken");
-      if (!token) return;
-
-      const res = await axios.get("http://localhost:4000/users/friends", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-
-      console.log("👥 친구 목록:", res.data);
-      setFriends(res.data);
-    } catch (err) {
-      console.error("❌ 친구 목록 불러오기 실패:", err);
-    }
-  };
 
   // ✅ 받은 친구 요청 불러오기
-  const fetchFriendRequests = async () => {
-    try {
-      const token = localStorage.getItem("accessToken");
-      if (!token) return;
-
-      const res = await axios.get(
-        "http://localhost:4000/users/friends/requests",
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-
-      console.log("📥 받은 요청:", res.data);
-      setFriendRequests(res.data);
-    } catch (err) {
-      console.error("❌ 친구 요청 목록 가져오기 실패:", err);
-    }
-  };
-
   useEffect(() => {
-    fetchFriends();
+    const fetchFriendRequests = async () => {
+      try {
+        const token = localStorage.getItem("accessToken");
+        if (!token) return;
+
+        const res = await axios.get(
+          "http://localhost:4000/users/friends/requests",
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        console.log("📥 받은 요청:", res.data);
+        setFriendRequests(res.data);
+      } catch (err) {
+        console.error("❌ 친구 요청 목록 가져오기 실패:", err);
+      }
+    };
+
     fetchFriendRequests();
   }, []);
 
@@ -119,14 +100,9 @@ const Find = () => {
       );
 
       alert("친구 요청 수락!");
-
-      // 친구 요청 목록 갱신
       setFriendRequests((prev) =>
         prev.filter((req) => req.requesterId !== requesterId)
       );
-
-      // ✅ 친구 목록도 갱신
-      fetchFriends();
     } catch (err) {
       console.error("❌ 친구 수락 실패:", err);
       alert("친구 요청 수락에 실패했습니다.");
@@ -226,24 +202,6 @@ const Find = () => {
                   >
                     거절
                   </button>
-                </div>
-              </div>
-            ))
-          )}
-        </div>
-
-        <div style={styles.section}>
-          <h3 style={styles.subtitle}>👥 내 친구 목록</h3>
-          {friends.length === 0 ? (
-            <p style={styles.emptyText}>친구가 없습니다.</p>
-          ) : (
-            friends.map((f) => (
-              <div key={f._id} style={styles.resultItem}>
-                <div>
-                  <span>{f.name}</span>{" "}
-                  <span style={{ color: "#6b7280", fontSize: "14px" }}>
-                    ({f.email})
-                  </span>
                 </div>
               </div>
             ))

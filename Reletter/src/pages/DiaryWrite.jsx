@@ -8,30 +8,12 @@ const DiaryWrite = () => {
   const [status, setStatus] = useState("");
   const [date, setDate] = useState("");
   const [group, setGroup] = useState("");
-  const [image, setImage] = useState(null); // 사진 상태
-  const [previewUrl, setPreviewUrl] = useState(null); // 미리보기
-
-  const handleImageChange = (e) => {
-    const file = e.target.files[0];
-    setImage(file);
-    if (file) {
-      setPreviewUrl(URL.createObjectURL(file));
-    } else {
-      setPreviewUrl(null);
-    }
-  };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    console.log("날짜:", date);
-    console.log("선택된 그룹:", group);
-  };
-
-  const handleReturnClick = () => {
-    navigate("/main");
-  };
+  const [myGroups, setMyGroups] = useState([]);
+  const [image, setImage] = useState(null);
+  const [previewUrl, setPreviewUrl] = useState(null);
 
   useEffect(() => {
+    // 상태 불러오기
     fetch("http://localhost:4000/diaries/status")
       .then((res) => res.json())
       .then((data) => setStatus(data.status))
@@ -39,6 +21,27 @@ const DiaryWrite = () => {
   }, []);
 
   useEffect(() => {
+    // 그룹 목록 불러오기
+    const fetchGroups = async () => {
+      try {
+        const token = localStorage.getItem("accessToken");
+        const res = await fetch("http://localhost:4000/users/groups/list", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        if (!res.ok) throw new Error("그룹 목록 불러오기 실패");
+        const data = await res.json();
+        setMyGroups(data);
+      } catch (err) {
+        console.error("❌ 그룹 목록 로딩 실패:", err);
+      }
+    };
+
+    fetchGroups();
+  }, []);
+
+  useEffect(() => {
+    // 자동 저장
     const autoSave = setInterval(() => {
       fetch("http://localhost:4000/diaries/auto-save", {
         method: "POST",
@@ -49,17 +52,24 @@ const DiaryWrite = () => {
     return () => clearInterval(autoSave);
   }, [title, content]);
 
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    setImage(file);
+    setPreviewUrl(file ? URL.createObjectURL(file) : null);
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    console.log("날짜:", date);
+    console.log("선택된 그룹:", group);
+  };
+
   const handleCreate = async () => {
     try {
       const res = await fetch("http://localhost:4000/diaries/create", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ 
-          title, 
-          content,
-          date,
-          group,
-        }),
+        body: JSON.stringify({ title, content, date, group }),
       });
       await res.json();
       alert("일기 생성 완료!");
@@ -84,6 +94,10 @@ const DiaryWrite = () => {
     }
   };
 
+  const handleReturnClick = () => {
+    navigate("/main");
+  };
+
   return (
     <div style={styles.page}>
       <button onClick={handleReturnClick} style={styles.returnBtn}>
@@ -101,7 +115,7 @@ const DiaryWrite = () => {
             type="file"
             accept="image/*"
             onChange={handleImageChange}
-            style={{ display: "none" }} // 숨김 처리
+            style={{ display: "none" }}
           />
           {previewUrl && (
             <img
@@ -136,7 +150,11 @@ const DiaryWrite = () => {
                 style={styles.input}
               >
                 <option value="">그룹을 선택하세요</option>
-                {/* 백엔드에서 받아올 예정 */}
+                {myGroups.map((g) => (
+                  <option key={g._id} value={g._id}>
+                    {g.name}
+                  </option>
+                ))}
               </select>
             </label>
           </form>
@@ -193,12 +211,6 @@ const styles = {
     boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.2)",
     height: "fit-content",
   },
-  subtitle: {
-    color: "#9d174d",
-    marginBottom: "1rem",
-    fontWeight: "bold",
-    fontSize: "20px",
-  },
   container: {
     width: "600px",
     backgroundColor: "white",
@@ -221,9 +233,9 @@ const styles = {
     cursor: "pointer",
     fontWeight: "bold",
     fontSize: "14px",
-    boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.1)",
     textAlign: "center",
     marginTop: "8px",
+    boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.1)",
   },
   form: {
     display: "flex",

@@ -41,7 +41,6 @@ const DiaryByDate = () => {
                   },
                 }
               );
-              console.log("diary.imageUrl:", diary.imageUrl);
 
               return {
                 ...group,
@@ -88,6 +87,12 @@ const DiaryByDate = () => {
           const diary = group.entries[0];
           if (!diary) return null;
 
+          const imageSrc = diary.imageUrl
+            ? diary.imageUrl.startsWith("http")
+              ? `${diary.imageUrl}?t=${new Date().getTime()}`
+              : `http://localhost:4000${diary.imageUrl}`
+            : "/close.png";
+
           return (
             <div
               key={group.id || group._id}
@@ -97,11 +102,7 @@ const DiaryByDate = () => {
               <h3 style={styles.groupTitle}>{group.groupName}</h3>
 
               <img
-                src={
-                  diary.imageUrl
-                    ? `${diary.imageUrl}?t=${new Date().getTime()}`
-                    : "/close.png"
-                }
+                src={imageSrc}
                 alt="preview"
                 onError={(e) => {
                   e.target.onerror = null;
@@ -112,7 +113,10 @@ const DiaryByDate = () => {
 
               <p style={styles.title}>{diary.previewText}</p>
               <p style={styles.readBy}>
-                일기를 펼쳐본 사람 👀 : {diary.readBy?.length > 0 ? diary.readBy.join(", ") : "아직 없음"}
+                일기를 펼쳐본 사람 👀 :{" "}
+                {diary.readBy?.length > 0
+                  ? diary.readBy.join(", ")
+                  : "아직 없음"}
               </p>
             </div>
           );
@@ -142,12 +146,12 @@ const styles = {
     alignItems: "center",
     cursor: "pointer",
     transition: "transform 0.2s",
-    width: "280px",
-    minHeight: "360px",
+    width: "500px",
+    height: "auto",
   },
   image: {
     width: "100%",
-    height: "160px",
+    height: "auto",
     objectFit: "cover",
     borderRadius: "12px",
     marginBottom: "12px",

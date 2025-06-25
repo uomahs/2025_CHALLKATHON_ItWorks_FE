@@ -37,7 +37,7 @@ const DiaryByDate = () => {
                 `http://localhost:4000/diaries/${diary.id}/read`,
                 {
                   headers: {
-                    Authorization: `Bearer ${accessToken}`,
+                    Authorization: `Bearer ${token}`,
                   },
                 }
               );

@@ -97,7 +97,9 @@ const DiaryByDate = () => {
             <div
               key={group.id || group._id}
               style={styles.groupBox}
-              onClick={() => navigate(`/diary/group/${group.id || group._id}`)}
+              onClick={() =>
+                navigate(`/diary/group/${group.id || group._id}?date=${date}`) // ✅ 쿼리 파라미터 추가
+              }
             >
               <h3 style={styles.groupTitle}>{group.groupName}</h3>
 

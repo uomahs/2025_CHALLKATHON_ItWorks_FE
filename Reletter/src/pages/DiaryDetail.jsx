@@ -1,12 +1,34 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useSearchParams } from "react-router-dom";
 import axios from "axios";
 import Header from "../components/Header";
 
+// ✅ YYYY-MM-DD 형식으로 로컬 시간대를 문자열로 변환
+const getLocalDateString = (dateObj) => {
+  const offset = dateObj.getTimezoneOffset();
+  const localDate = new Date(dateObj.getTime() - offset * 60000);
+  return localDate.toISOString().slice(0, 10);
+};
+
 const DiaryDetail = () => {
   const { groupId } = useParams();
+  const [searchParams] = useSearchParams();
+
+  const [date, setDate] = useState(""); // 빈 초기값
   const [diaries, setDiaries] = useState([]);
 
+  // ✅ 쿼리 파라미터로 전달된 날짜로만 설정
+  useEffect(() => {
+    const paramDate = searchParams.get("date");
+    if (paramDate) {
+      setDate(paramDate);
+    } else {
+      const today = getLocalDateString(new Date());
+      setDate(today); // fallback (사실상 안 쓰일 예정)
+    }
+  }, [searchParams]);
+
+  // ✅ 그룹ID + 날짜 기준으로 일기 불러오기
   useEffect(() => {
     const fetchGroupDiaries = async () => {
       try {
@@ -17,7 +39,7 @@ const DiaryDetail = () => {
         }
 
         const res = await axios.get(
-          `http://localhost:4000/diaries/group/${groupId}`,
+          `http://localhost:4000/diaries/group/${groupId}?date=${date}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -32,10 +54,10 @@ const DiaryDetail = () => {
       }
     };
 
-    if (groupId) {
+    if (groupId && date) {
       fetchGroupDiaries();
     }
-  }, [groupId]);
+  }, [groupId, date]);
 
   return (
     <div
@@ -47,8 +69,8 @@ const DiaryDetail = () => {
       <div>
         <Header />
       </div>
-      <div style={styles.wrapper}>
-        <h1 style={styles.pageTitle}>📘 그룹 일기 목록</h1>
+    <div style={styles.wrapper}>
+      <h1 style={styles.pageTitle}>📘 그룹 일기 목록 ({date})</h1>
 
         {diaries.length === 0 ? (
           <p style={styles.emptyMessage}>작성된 일기가 없습니다.</p>

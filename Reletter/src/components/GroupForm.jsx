@@ -1,8 +1,35 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 function GroupForm({ onCreated }) {
   const [groupName, setGroupName] = useState("");
+  const [friends, setFriends] = useState([]);
   const [selectedFriends, setSelectedFriends] = useState([]);
+
+  // 친구 목록 불러오기
+  useEffect(() => {
+    const fetchFriends = async () => {
+      try {
+        const res = await fetch("http://localhost:4000/users/friends", {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+          },
+        });
+        const data = await res.json();
+        setFriends(data);
+      } catch (err) {
+        console.error("친구 목록 불러오기 실패:", err);
+      }
+    };
+    fetchFriends();
+  }, []);
+
+  const toggleFriend = (friendId) => {
+    setSelectedFriends((prev) =>
+      prev.includes(friendId)
+        ? prev.filter((id) => id !== friendId)
+        : [...prev, friendId]
+    );
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -31,6 +58,7 @@ function GroupForm({ onCreated }) {
         body: JSON.stringify({ userIds: selectedFriends }),
       });
 
+      alert("그룹이 생성되었습니다!");
       onCreated(); // 부모 컴포넌트에 알림
     } catch (err) {
       console.error(err);
@@ -56,9 +84,32 @@ function GroupForm({ onCreated }) {
 
       <label style={styles.label}>
         친구 선택:
-        <p style={{ color: "#888", marginTop: "8px" }}>
-          친구 목록은 추후 표시될 예정입니다.
-        </p>
+        <div style={styles.friendList}>
+          {friends.length === 0 ? (
+            <p style={{ fontSize: "16px",
+              color: "#888",
+               margin: 0,
+               height: "50px",
+               display: "flex",
+               justifyContent: "center",
+               alignItems: "center",
+               textAlign: "center",}}>친구가 없습니다.</p>
+          ) : (
+            friends.map((friend) => (
+              <div key={friend._id} style={{ marginBottom: "6px" }}>
+                <label>
+                  <input
+                    type="checkbox"
+                    checked={selectedFriends.includes(friend._id)}
+                    onChange={() => toggleFriend(friend._id)}
+                    style={{ marginRight: "8px" }}
+                  />
+                  {friend.name} ({friend.email})
+                </label>
+              </div>
+            ))
+          )}
+        </div>
       </label>
 
       <button type="submit" style={styles.button}>
@@ -99,6 +150,15 @@ const styles = {
     border: "1px solid #ccc",
     marginBottom: "20px",
     boxSizing: "border-box",
+  },
+  friendList: {
+    maxHeight: "200px",
+    overflowY: "auto",
+    paddingLeft: "10px",
+    marginTop: "10px",
+    border: "1px solid #ddd",
+    borderRadius: "8px",
+    padding: "10px",
   },
   button: {
     width: "100%",

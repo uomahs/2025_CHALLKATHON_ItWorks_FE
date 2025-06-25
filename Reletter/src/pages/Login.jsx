@@ -89,11 +89,16 @@ const Login = () => {
         },
         body: JSON.stringify(data),
       });
-
+  
       const result = await res.json();
-      console.log("back: ", result);
+  
+      if (!res.ok) {
+        alert(result.message || "로그인 실패");
+        return;
+      }
+  
+      // 정상 로그인 처리
       alert("로그인 성공!");
-
       localStorage.setItem("accessToken", result.token);
       navigate("/main");
     } catch (error) {

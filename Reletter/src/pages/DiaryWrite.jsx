@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 
 const DiaryWrite = () => {
   const navigate = useNavigate();
+  const [diaryId, setDiaryId] = useState(null); // 자동 저장/임시 저장된 일기의 _id
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [status, setStatus] = useState("");
@@ -42,12 +43,26 @@ const DiaryWrite = () => {
 
   useEffect(() => {
     // 자동 저장
-    const autoSave = setInterval(() => {
-      fetch("http://localhost:4000/diaries/auto-save", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ title, content }),
-      });
+    const autoSave = setInterval(async () => {
+      try {
+        const token = localStorage.getItem("accessToken");
+
+        const res = await fetch("http://localhost:4000/diaries/auto-save", {
+          method: "POST",
+          headers: { 
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ title, content }),
+        });
+
+        const data = await res.json();
+        setDiaryId(data.diary?._id); // <- 자동 저장된 일기 ID 기억
+        console.log("자동 저장됨");
+
+      } catch (err) {
+        console.error("자동 저장 실패:", err);
+      }
     }, 150000);
     return () => clearInterval(autoSave);
   }, [title, content]);
@@ -69,8 +84,9 @@ const DiaryWrite = () => {
       const res = await fetch("http://localhost:4000/diaries/create", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ title, content, date, group }),
+        body: JSON.stringify({ title, content, date, group, _id: diaryId }),
       });
+
       await res.json();
       alert("일기 생성 완료!");
       navigate("/main");
@@ -82,12 +98,21 @@ const DiaryWrite = () => {
 
   const handleTempSave = async () => {
     try {
-      await fetch("http://localhost:4000/diaries/temp", {
+      const token = localStorage.getItem("accessToken");
+
+      const res = await fetch("http://localhost:4000/diaries/temp", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { 
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
         body: JSON.stringify({ title, content }),
       });
+
+      const data = await res.json();
+      setDiaryId(data.diary?._id); // <- 임시 저장된 일기 ID 기억
       alert("임시 저장 완료");
+      console.log("임시 저장 완료");
     } catch (err) {
       console.error("임시 저장 오류:", err);
       alert("임시 저장 실패");

@@ -11,8 +11,10 @@ function Calendar() {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState(null);
   const [unreadSummary, setUnreadSummary] = useState({});
+  const [loading, setLoading] = useState(true);
   const year = currentDate.getFullYear();
   const month = currentDate.getMonth();
+
   useEffect(() => {
     const fetchUnreadSummary = async () => {
       try {
@@ -30,6 +32,8 @@ function Calendar() {
         setUnreadSummary(res.data);
       } catch (error) {
         console.error("❌ 읽지 않은 요약 불러오기 실패:", error);
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -72,6 +76,12 @@ function Calendar() {
   }
   for (let i = 1; i <= lastDate; i++) {
     dates.push(i);
+  }
+
+  if (loading) {
+    return (
+      <p style={{ textAlign: "center", marginTop: "100px" }}>로딩 중...</p>
+    );
   }
 
   return (
@@ -122,8 +132,9 @@ function Calendar() {
               2,
               "0"
             )}-${String(day).padStart(2, "0")}`;
-            const unreadCount = unreadSummary[formattedDate] || 0;
-            const groupCount = unreadSummary[formattedDate]?.groupCount || 0;
+            const daySummary = unreadSummary[formattedDate];
+            const unreadCount = daySummary?.unreadCount || 0;
+            const groupCount = daySummary?.groupCount || 0;
 
             return (
               <div
@@ -153,51 +164,45 @@ function Calendar() {
                   {day || ""}
                 </div>
 
-                {day && unreadCount > 0 && (
+                {day &&
+                  daySummary &&
+                  daySummary.totalCount > 0 &&
+                  daySummary.unreadCount > 0 && (
+                    <div
+                      style={{
+                        fontSize: "15px",
+                        color: "#d94673",
+                        paddingBottom: "25px",
+                      }}
+                    >
+                      💌 미열람 일기 {daySummary.unreadCount}개
+                    </div>
+                  )}
+
+                {day &&
+                  daySummary &&
+                  daySummary.totalCount > 0 &&
+                  daySummary.unreadCount === 0 && (
+                    <div
+                      style={{
+                        fontSize: "15px",
+                        color: "#d94673",
+                        paddingBottom: "25px",
+                      }}
+                    >
+                      ❤️ 일기 열람 완료
+                    </div>
+                  )}
+
+                {day && (!daySummary || daySummary.totalCount === 0) && (
                   <div
                     style={{
                       fontSize: "15px",
-                      color: "#d94673",
+                      color: "#9ca3af",
                       paddingBottom: "25px",
                     }}
                   >
-                    {" "}
-                    💌 미열람 일기 {unreadCount}개
-                  </div>
-                )}
-
-                {day && unreadCount === 0 && (
-                  <div
-                    style={{
-                      fontSize: "15px",
-                      color: "#d94673",
-                      paddingBottom: "25px",
-                    }}
-                  >
-                    ❤️ 일기 열람 완료
-                  </div>
-                )}
-
-                {day && groupCount > 0 && (
-                  <div
-                    style={{
-                      marginTop: "4px",
-                      display: "flex",
-                      gap: "4px",
-                      justifyContent: "center",
-                    }}
-                  >
-                    {Array.from({ length: groupCount }).map((_, i) => (
-                      <div
-                        key={i}
-                        style={{
-                          width: "6px",
-                          height: "6px",
-                          borderRadius: "50%",
-                          backgroundColor: "#d94673",
-                        }}
-                      />
-                    ))}
+                    ✍️ 일기 없음
                   </div>
                 )}
               </div>
@@ -232,6 +237,7 @@ function NavButton({ onClick, children }) {
     </button>
   );
 }
+
 const styles = {
   readStatus: {
     position: "absolute",

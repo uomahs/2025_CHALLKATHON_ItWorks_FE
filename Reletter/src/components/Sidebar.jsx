@@ -28,12 +28,9 @@ function Sidebar() {
 
     const fetchGroups = async () => {
       try {
-        const res = await fetch(
-          "http://localhost:4000/users/groups/:groupId/members",
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          }
-        );
+        const res = await fetch("http://localhost:4000/users/groups/list", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
         if (!res.ok) throw new Error("그룹 목록 불러오기 실패");
         const data = await res.json();
         setGroups(data);
@@ -130,7 +127,7 @@ function Sidebar() {
               </p>
               <ul>
                 {selectedGroup.members?.map((m) => (
-                  <li key={m.id}>{m.name}</li>
+                  <li key={m.id || m._id}>{m.name}</li>
                 ))}
               </ul>
             </div>

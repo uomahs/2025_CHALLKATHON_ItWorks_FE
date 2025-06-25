@@ -41,6 +41,7 @@ const DiaryByDate = () => {
                   },
                 }
               );
+              console.log("diary.imageUrl:", diary.imageUrl);
 
               return {
                 ...group,
@@ -77,7 +78,7 @@ const DiaryByDate = () => {
     <div
       style={{
         backgroundColor: "#fff0f6",
-        paddingBottom: "80px",
+        paddingBottom: "132px",
         marginTop: "-40px",
       }}
     >
@@ -96,7 +97,11 @@ const DiaryByDate = () => {
               <h3 style={styles.groupTitle}>{group.groupName}</h3>
 
               <img
-                src={diary.imageUrl ? diary.imageUrl : "/close.png"}
+                src={
+                  diary.imageUrl
+                    ? `${diary.imageUrl}?t=${new Date().getTime()}`
+                    : "/close.png"
+                }
                 alt="preview"
                 onError={(e) => {
                   e.target.onerror = null;

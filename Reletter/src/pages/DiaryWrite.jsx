@@ -81,11 +81,21 @@ const DiaryWrite = () => {
 
   const handleCreate = async () => {
     try {
+      const token = localStorage.getItem("accessToken");
+
       const res = await fetch("http://localhost:4000/diaries/create", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { 
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
         body: JSON.stringify({ title, content, date, group, _id: diaryId }),
       });
+
+      if (res.status === 403) {
+      alert("접근 권한이 없습니다.");
+      return;
+      }
 
       await res.json();
       alert("일기 생성 완료!");

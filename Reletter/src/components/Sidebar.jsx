@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 function Sidebar() {
@@ -6,8 +6,32 @@ function Sidebar() {
   const [friends, setFriends] = useState([]);
   const navigate = useNavigate();
 
+  // ✅ 친구 목록 불러오기
+  useEffect(() => {
+    const fetchFriends = async () => {
+      try {
+        const res = await fetch("http://localhost:4000/users/friends/list", {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+          },
+        });
+
+        if (!res.ok) {
+          throw new Error("친구 목록을 불러오지 못했습니다.");
+        }
+
+        const data = await res.json();
+        setFriends(data);
+      } catch (err) {
+        console.error("❌ 친구 목록 로딩 실패:", err);
+      }
+    };
+
+    fetchFriends();
+  }, []);
+
   const addGroup = () => {
-    navigate("/Group"); // ✅ 페이지 이동으로 변경
+    navigate("/Group");
   };
 
   const handleFindClick = () => {
@@ -34,7 +58,7 @@ function Sidebar() {
           <p style={emptyTextStyle}>아직 추가된 친구가 없습니다.</p>
         )}
         {friends.map((friend) => (
-          <SidebarItem key={friend.id} label={`🧑 ${friend.name}`} />
+          <SidebarItem key={friend.id} label={`${friend.name}`} />
         ))}
         <button onClick={handleFindClick} style={addButtonStyle}>
           + 친구 찾기

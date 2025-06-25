@@ -16,17 +16,17 @@ function Calendar() {
   useEffect(() => {
     const fetchUnreadSummary = async () => {
       try {
-        const token = localStorage.getItem("accessToken");
         const res = await axios.get(
-          `http://localhost:4000/diaries/unread-summary?year=${year}&month=${String(
+          `http://localhost:4000/diaries/count-by-date?year=${year}&month=${String(
             month + 1
           ).padStart(2, "0")}`,
           {
             headers: {
-              Authorization: `Bearer ${token}`,
+              Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
             },
           }
         );
+
         setUnreadSummary(res.data);
       } catch (error) {
         console.error("❌ 읽지 않은 요약 불러오기 실패:", error);

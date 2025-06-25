@@ -8,6 +8,7 @@ const Find = () => {
   const [searchResults, setSearchResults] = useState([]);
   const [friendRequests, setFriendRequests] = useState([]);
 
+<<<<<<< Updated upstream
   // ✅ 받은 친구 요청 불러오기
   useEffect(() => {
     const fetchFriendRequests = async () => {
@@ -34,6 +35,27 @@ const Find = () => {
     fetchFriendRequests();
   }, []);
 
+=======
+  useEffect(() => {
+    fetchFriendRequests();
+  }, []);
+
+  const fetchFriendRequests = async () => {
+    try {
+      const token = localStorage.getItem("accessToken");
+      if (!token) return;
+
+      const res = await axios.get("http://localhost:4000/users/friends/requests", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      setFriendRequests(res.data);
+    } catch (err) {
+      console.error("❌ 친구 요청 불러오기 실패:", err);
+    }
+  };
+
+>>>>>>> Stashed changes
   const handleSearch = async () => {
     try {
       const token = localStorage.getItem("accessToken");
@@ -51,7 +73,10 @@ const Find = () => {
         }
       );
 
+<<<<<<< Updated upstream
       console.log("검색 결과: ", res.data);
+=======
+>>>>>>> Stashed changes
       setSearchResults(res.data);
     } catch (err) {
       console.error("❌ 검색 실패:", err);
@@ -77,7 +102,11 @@ const Find = () => {
         }
       );
 
+<<<<<<< Updated upstream
       alert(`${user.name} 님에게 친구 신청을 보냈습니다!`);
+=======
+      alert(`${userId}에게 친구 신청 보냈습니다!`);
+>>>>>>> Stashed changes
     } catch (err) {
       console.error("❌ 친구 신청 실패:", err);
       alert("친구 신청에 실패했습니다.");
@@ -93,6 +122,7 @@ const Find = () => {
         "http://localhost:4000/users/friends/accept",
         { requesterId },
         {
+<<<<<<< Updated upstream
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -102,6 +132,15 @@ const Find = () => {
       alert("친구 요청 수락!");
       setFriendRequests((prev) =>
         prev.filter((req) => req.requesterId !== requesterId)
+=======
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+
+      alert(`${requesterId} 친구 요청 수락!`);
+      setFriendRequests((prev) =>
+        prev.filter((req) => req.requester._id !== requesterId)
+>>>>>>> Stashed changes
       );
     } catch (err) {
       console.error("❌ 친구 수락 실패:", err);
@@ -118,6 +157,7 @@ const Find = () => {
         "http://localhost:4000/users/friends/reject",
         { requesterId },
         {
+<<<<<<< Updated upstream
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -127,6 +167,15 @@ const Find = () => {
       alert("친구 요청 거절!");
       setFriendRequests((prev) =>
         prev.filter((req) => req.requesterId !== requesterId)
+=======
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+
+      alert(`${requesterId} 친구 요청 거절!`);
+      setFriendRequests((prev) =>
+        prev.filter((req) => req.requester._id !== requesterId)
+>>>>>>> Stashed changes
       );
     } catch (err) {
       console.error("❌ 친구 거절 실패:", err);
@@ -182,17 +231,25 @@ const Find = () => {
             <p style={styles.emptyText}>받은 요청이 없습니다.</p>
           ) : (
             friendRequests.map((req) => (
-              <div key={req.id} style={styles.resultItem}>
-                <span>{req.name}</span>
+              <div key={req.requester._id} style={styles.resultItem}>
+                <span>{req.requester.name} ({req.requester.email})</span>
                 <div>
                   <button
+<<<<<<< Updated upstream
                     onClick={() => handleAccept(req.requesterId)}
+=======
+                    onClick={() => handleAccept(req.requester._id)}
+>>>>>>> Stashed changes
                     style={styles.acceptButton}
                   >
                     수락
                   </button>
                   <button
+<<<<<<< Updated upstream
                     onClick={() => handleReject(req.requesterId)}
+=======
+                    onClick={() => handleReject(req.requester._id)}
+>>>>>>> Stashed changes
                     style={styles.rejectButton}
                   >
                     거절
@@ -280,10 +337,33 @@ const styles = {
   },
   subButton: baseButton,
   acceptButton: {
+<<<<<<< Updated upstream
     ...baseButton,
     marginRight: "6px",
   },
   rejectButton: baseButton,
+=======
+    padding: "6px 10px",
+    fontSize: "14px",
+    backgroundColor: "#34d399",
+    border: "none",
+    borderRadius: "6px",
+    color: "white",
+    cursor: "pointer",
+    fontWeight: "bold",
+    marginRight: "6px",
+  },
+  rejectButton: {
+    padding: "6px 10px",
+    fontSize: "14px",
+    backgroundColor: "#f87171",
+    border: "none",
+    borderRadius: "6px",
+    color: "white",
+    cursor: "pointer",
+    fontWeight: "bold",
+  },
+>>>>>>> Stashed changes
   emptyText: {
     color: "#6b7280",
     fontSize: "14px",

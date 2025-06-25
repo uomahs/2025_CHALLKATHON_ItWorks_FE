@@ -122,7 +122,7 @@ function Calendar() {
               2,
               "0"
             )}-${String(day).padStart(2, "0")}`;
-            const unreadCount = unreadSummary[formattedDate]?.count || 0;
+            const unreadCount = unreadSummary[formattedDate] || 0;
             const groupCount = unreadSummary[formattedDate]?.groupCount || 0;
 
             return (
@@ -154,7 +154,14 @@ function Calendar() {
                 </div>
 
                 {day && unreadCount > 0 && (
-                  <div style={{ fontSize: "12px", color: "#d94673" }}>
+                  <div
+                    style={{
+                      fontSize: "15px",
+                      color: "#d94673",
+                      paddingBottom: "25px",
+                    }}
+                  >
+                    {" "}
                     💌 미열람 일기 {unreadCount}개
                   </div>
                 )}
@@ -162,12 +169,12 @@ function Calendar() {
                 {day && unreadCount === 0 && (
                   <div
                     style={{
-                      fontSize: "20px",
+                      fontSize: "15px",
                       color: "#d94673",
                       paddingBottom: "25px",
                     }}
                   >
-                    🩷
+                    ❤️ 일기 열람 완료
                   </div>
                 )}
 

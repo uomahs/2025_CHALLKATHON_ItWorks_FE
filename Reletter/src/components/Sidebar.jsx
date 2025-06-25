@@ -1,9 +1,13 @@
+// Sidebar.jsx
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 function Sidebar() {
   const [groups, setGroups] = useState([]);
   const [friends, setFriends] = useState([]);
+  const [selectedFriend, setSelectedFriend] = useState(null);
+  const [selectedGroup, setSelectedGroup] = useState(null);
+
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -24,9 +28,12 @@ function Sidebar() {
 
     const fetchGroups = async () => {
       try {
-        const res = await fetch("http://localhost:4000/users/groups/list", {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        const res = await fetch(
+          "http://localhost:4000/users/groups/:groupId/members",
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
         if (!res.ok) throw new Error("그룹 목록 불러오기 실패");
         const data = await res.json();
         setGroups(data);
@@ -43,40 +50,103 @@ function Sidebar() {
   const handleFindClick = () => navigate("/findfriend");
 
   return (
-    <aside style={sidebarStyle}>
-      <h3 style={sectionTitle}>📂 그룹</h3>
-      <div style={sectionListStyle}>
-        {groups.length === 0 ? (
-          <p style={emptyTextStyle}>아직 생성된 그룹이 없습니다.</p>
-        ) : (
-          groups.map((group) => (
-            <SidebarItem key={group._id} label={`💌 ${group.name}`} />
-          ))
-        )}
-        <button onClick={addGroup} style={addButtonStyle}>
-          + 그룹 추가
-        </button>
-      </div>
+    <>
+      <aside style={sidebarStyle}>
+        <h3 style={sectionTitle}>📂 그룹</h3>
+        <div style={sectionListStyle}>
+          {groups.length === 0 ? (
+            <p style={emptyTextStyle}>아직 생성된 그룹이 없습니다.</p>
+          ) : (
+            groups.map((group) => (
+              <SidebarItem
+                key={group._id}
+                label={`💌 ${group.name}`}
+                onClick={() => {
+                  setSelectedFriend(null);
+                  setSelectedGroup(group);
+                }}
+              />
+            ))
+          )}
+          <button onClick={addGroup} style={addButtonStyle}>
+            + 그룹 추가
+          </button>
+        </div>
 
-      <h3 style={{ ...sectionTitle, marginTop: "24px" }}>👥 친구 목록</h3>
-      <div style={{ ...sectionListStyle, flexGrow: 1 }}>
-        {friends.length === 0 ? (
-          <p style={emptyTextStyle}>아직 추가된 친구가 없습니다.</p>
-        ) : (
-          friends.map((friend) => (
-            <SidebarItem key={friend.id} label={friend.name} />
-          ))
-        )}
-        <button onClick={handleFindClick} style={addButtonStyle}>
-          + 친구 찾기
-        </button>
-      </div>
-    </aside>
+        <h3 style={{ ...sectionTitle, marginTop: "24px" }}>👥 친구 목록</h3>
+        <div style={{ ...sectionListStyle, flexGrow: 1 }}>
+          {friends.length === 0 ? (
+            <p style={emptyTextStyle}>아직 추가된 친구가 없습니다.</p>
+          ) : (
+            friends.map((friend) => (
+              <SidebarItem
+                key={friend.id}
+                label={friend.name}
+                onClick={() => {
+                  setSelectedGroup(null);
+                  setSelectedFriend(friend);
+                }}
+              />
+            ))
+          )}
+          <button onClick={handleFindClick} style={addButtonStyle}>
+            + 친구 찾기
+          </button>
+        </div>
+      </aside>
+
+      {(selectedFriend || selectedGroup) && (
+        <div style={popupStyle}>
+          <div style={{ display: "flex", justifyContent: "space-between" }}>
+            <strong>상세 정보</strong>
+            <button
+              onClick={() => {
+                setSelectedFriend(null);
+                setSelectedGroup(null);
+              }}
+            >
+              ✖︎
+            </button>
+          </div>
+
+          {selectedFriend && (
+            <div>
+              <p>
+                <strong>이름:</strong> {selectedFriend.name}
+              </p>
+              <p>
+                <strong>이메일:</strong> {selectedFriend.email}
+              </p>
+            </div>
+          )}
+
+          {selectedGroup && (
+            <div>
+              <p>
+                <strong>그룹 이름:</strong> {selectedGroup.name}
+              </p>
+              <p>
+                <strong>구성원:</strong>
+              </p>
+              <ul>
+                {selectedGroup.members?.map((m) => (
+                  <li key={m.id}>{m.name}</li>
+                ))}
+              </ul>
+            </div>
+          )}
+        </div>
+      )}
+    </>
   );
 }
 
-function SidebarItem({ label }) {
-  return <div style={linkStyle}>{label}</div>;
+function SidebarItem({ label, onClick }) {
+  return (
+    <div style={linkStyle} onClick={onClick}>
+      {label}
+    </div>
+  );
 }
 
 const sidebarStyle = {
@@ -87,6 +157,18 @@ const sidebarStyle = {
   display: "flex",
   flexDirection: "column",
   boxShadow: "2px 0 6px rgba(0, 0, 0, 0.05)",
+};
+
+const popupStyle = {
+  position: "fixed",
+  top: "220px",
+  left: "220px",
+  width: "260px",
+  backgroundColor: "#fff0f5",
+  padding: "16px",
+  borderRadius: "10px",
+  boxShadow: "0 0 10px rgba(0,0,0,0.1)",
+  zIndex: 1000,
 };
 
 const sectionTitle = {

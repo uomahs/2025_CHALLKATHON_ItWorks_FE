@@ -80,7 +80,7 @@ const Find = () => {
       alert(`${user.name} 님에게 친구 신청을 보냈습니다!`);
     } catch (err) {
       console.error("❌ 친구 신청 실패:", err);
-      alert("친구 신청에 실패했습니다.");
+      alert("이미 친구 신청을 보냈습니다!");
     }
   };
 

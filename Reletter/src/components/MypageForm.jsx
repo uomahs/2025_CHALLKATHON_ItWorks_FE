@@ -26,7 +26,7 @@ const MyPageForm = () => {
   }, []);
 
   const handleLogout = () => {
-    localStorage.removeItem("token");
+    localStorage.removeItem("accessToken");
     navigate("/login");
   };
 
@@ -78,7 +78,7 @@ const MyPageForm = () => {
           <h2 style={styles.title}>마이페이지</h2>
 
           <div style={styles.infoBox}>
-            <label>이름</label>
+            <label style={{ color: "#9d174d" }}> 이름</label>
             {isEditing ? (
               <input
                 type="text"
@@ -94,7 +94,7 @@ const MyPageForm = () => {
           </div>
 
           <div style={styles.infoBox}>
-            <label>이메일</label>
+            <label style={{ color: "#9d174d" }}>이메일</label>
             {isEditing ? (
               <input
                 type="email"

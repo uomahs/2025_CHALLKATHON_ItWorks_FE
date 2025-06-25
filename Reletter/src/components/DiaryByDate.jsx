@@ -81,8 +81,8 @@ const DiaryByDate = () => {
         marginTop: "-40px",
       }}
     >
+      <h2 style={styles.dateTitle}>❤️ {formatDate(date)} ❤️</h2>
       <div style={styles.container}>
-        <h2 style={styles.dateTitle}>❤️ {formatDate(date)} ❤️</h2>
 
         {groupPreviews.map((group) => {
           const diary = group.entries[0];
@@ -123,33 +123,36 @@ const DiaryByDate = () => {
 
 const styles = {
   container: {
-    maxWidth: "720px",
+    maxWidth: "2000px",
     margin: "40px auto",
     display: "flex",
-    flexDirection: "column",
-    gap: "24px",
+    flexWrap: "wrap",
+    justifyContent: "center",
+    gap: "20px",
     padding: "0 16px",
   },
   groupBox: {
     backgroundColor: "#ffffff",
     borderRadius: "16px",
-    padding: "24px",
-    boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+    padding: "16px",
+    boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
     display: "flex",
     flexDirection: "column",
     alignItems: "center",
     cursor: "pointer",
     transition: "transform 0.2s",
-    width: "100%",
+    width: "280px",
+    minHeight: "360px", 
   },
   image: {
     width: "100%",
-    height: "auto",
+    height: "160",
     objectFit: "cover",
     borderRadius: "12px",
     marginBottom: "12px",
   },
   dateTitle: {
+    marginTop: "40px",
     fontSize: "22px",
     fontWeight: "bold",
     marginBottom: "20px",

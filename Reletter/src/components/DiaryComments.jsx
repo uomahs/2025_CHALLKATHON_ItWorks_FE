@@ -5,7 +5,7 @@ const DiaryComments = ({ diaryId }) => {
   const [comments, setComments] = useState([]);
   const [commentInput, setCommentInput] = useState("");
 
-  // fetchComments 함수는 한 번만 정의
+  // 댓글 불러오기 함수
   const fetchComments = async () => {
     try {
       const token = localStorage.getItem("accessToken");
@@ -15,7 +15,7 @@ const DiaryComments = ({ diaryId }) => {
           headers: { Authorization: `Bearer ${token}` },
         }
       );
-      console.log("댓글 응답:", res.data);  // 디버깅용
+      console.log("댓글 응답:", res.data); // 디버깅용
       setComments(res.data);
     } catch (err) {
       console.error("댓글 불러오기 실패:", err);
@@ -26,6 +26,7 @@ const DiaryComments = ({ diaryId }) => {
     fetchComments();
   }, [diaryId]);
 
+  // 댓글 등록 핸들러
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!commentInput.trim()) return;
@@ -49,18 +50,30 @@ const DiaryComments = ({ diaryId }) => {
   return (
     <div style={{ marginTop: "16px" }}>
       <h4 style={{ marginBottom: "8px", color: "#d94673" }}>💬 댓글</h4>
-      {comments.length === 0 ? (
-        <p style={{ color: "#aaa", fontSize: "14px" }}>아직 댓글이 없습니다.</p>
-      ) : (
-        comments.map((c, idx) => (
-          <div key={idx} style={{ marginBottom: "8px" }}>
-            <strong>{c.author?.name || "익명"}</strong>: {c.content}
-            <div style={{ fontSize: "12px", color: "#999" }}>
-              {new Date(c.createdAt).toLocaleString("ko-KR")}
+      <div
+        style={{
+          maxHeight: "300px",       // 최대 높이 지정
+          overflowY: "auto",        // 세로 스크롤 활성화
+          paddingRight: "8px",      // 스크롤바 공간 확보
+          marginBottom: "12px",
+          border: "1px solid #ddd",
+          borderRadius: "8px",
+          backgroundColor: "#fff",
+        }}
+      >
+        {comments.length === 0 ? (
+          <p style={{ color: "#aaa", fontSize: "14px" }}>아직 댓글이 없습니다.</p>
+        ) : (
+          comments.map((c, idx) => (
+            <div key={idx} style={{ marginBottom: "8px" }}>
+              <strong>{c.author?.name || "익명"}</strong>: {c.content}
+              <div style={{ fontSize: "12px", color: "#999" }}>
+                {new Date(c.createdAt).toLocaleString("ko-KR")}
+              </div>
             </div>
-          </div>
-        ))
-      )}
+          ))
+        )}
+      </div>
 
       <form onSubmit={handleSubmit} style={{ marginTop: "8px" }}>
         <input

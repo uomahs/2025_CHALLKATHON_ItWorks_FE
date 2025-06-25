@@ -59,7 +59,7 @@ const DiaryByDate = () => {
           })
         );
 
-        setGroupPreviews(updatedGroups);
+        setGroupPreviews(updatedGroups.filter(Boolean));
       } catch (err) {
         console.error("❌ 일기 조회 실패:", err);
         alert("작성된 일기가 없습니다.");
@@ -86,13 +86,13 @@ const DiaryByDate = () => {
       <div style={styles.container}>
         {groupPreviews.map((group) => {
           const diary = group.entries[0];
-          if (!diary) return null; // diary가 없으면 렌더링하지 않음
+          if (!diary) return null;
 
           return (
             <div
-              key={group.id}
+              key={group.id || group._id}
               style={styles.groupBox}
-              onClick={() => navigate(`/diary/detail/${diary.id}`)}
+              onClick={() => navigate(`/diary/group/${group.id || group._id}`)}
             >
               <h3 style={styles.groupTitle}>{group.groupName}</h3>
 
@@ -112,10 +112,7 @@ const DiaryByDate = () => {
 
               <p style={styles.title}>{diary.previewText}</p>
               <p style={styles.readBy}>
-                일기를 펼쳐본 사람 👀 :{" "}
-                {diary.readBy && diary.readBy.length > 0
-                  ? diary.readBy.join(", ")
-                  : "아직 없음"}
+                일기를 펼쳐본 사람 👀 : {diary.readBy?.length > 0 ? diary.readBy.join(", ") : "아직 없음"}
               </p>
             </div>
           );
@@ -150,6 +147,7 @@ const styles = {
   },
   image: {
     width: "100%",
+    height: "160px",
     objectFit: "cover",
     borderRadius: "12px",
     marginBottom: "12px",
@@ -162,7 +160,6 @@ const styles = {
     color: "#d94673",
     textAlign: "center",
   },
-
   groupTitle: {
     fontSize: "30px",
     fontWeight: "bold",

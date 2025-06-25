@@ -3,7 +3,7 @@ import { useParams } from "react-router-dom";
 import axios from "axios";
 
 const DiaryDetail = () => {
-  const { id } = useParams(); // 이건 group ID
+  const { groupId } = useParams(); // ✅ 그룹 ID 받기
   const [diaries, setDiaries] = useState([]);
 
   useEffect(() => {
@@ -16,7 +16,7 @@ const DiaryDetail = () => {
         }
 
         const res = await axios.get(
-          `http://localhost:4000/diaries/group/${id}`,
+          `http://localhost:4000/diaries/group/${groupId}`, // ✅ groupId로 수정
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -31,8 +31,10 @@ const DiaryDetail = () => {
       }
     };
 
-    fetchGroupDiaries();
-  }, [id]);
+    if (groupId) {
+      fetchGroupDiaries();
+    }
+  }, [groupId]);
 
   return (
     <div style={styles.wrapper}>

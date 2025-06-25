@@ -25,6 +25,8 @@ function App() {
       <Route path="/mypage" element={<MyPage />} />
       <Route path="/diary/:date" element={<Diary />} />
       <Route path="/diary/detail/:id" element={<DiaryDetail />} />
+      <Route path="/diary/group/:groupId" element={<DiaryDetail />} />
+
     </Routes>
   );
 }

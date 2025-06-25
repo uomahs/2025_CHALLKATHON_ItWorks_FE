@@ -48,7 +48,7 @@ const DiaryWrite = () => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ title, content }),
       });
-    }, 10000);
+    }, 150000);
     return () => clearInterval(autoSave);
   }, [title, content]);
 

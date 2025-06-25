@@ -41,6 +41,7 @@ const DiaryByDate = () => {
                   },
                 }
               );
+              console.log("diary.imageUrl:", diary.imageUrl);
 
               return {
                 ...group,
@@ -77,13 +78,12 @@ const DiaryByDate = () => {
     <div
       style={{
         backgroundColor: "#fff0f6",
-        paddingBottom: "80px",
+        paddingBottom: "132px",
         marginTop: "-40px",
       }}
     >
       <h2 style={styles.dateTitle}>❤️ {formatDate(date)} ❤️</h2>
       <div style={styles.container}>
-
         {groupPreviews.map((group) => {
           const diary = group.entries[0];
           if (!diary) return null; // diary가 없으면 렌더링하지 않음
@@ -97,7 +97,11 @@ const DiaryByDate = () => {
               <h3 style={styles.groupTitle}>{group.groupName}</h3>
 
               <img
-                src={diary.imageUrl ? diary.imageUrl : "/close.png"}
+                src={
+                  diary.imageUrl
+                    ? `${diary.imageUrl}?t=${new Date().getTime()}`
+                    : "/close.png"
+                }
                 alt="preview"
                 onError={(e) => {
                   e.target.onerror = null;
@@ -142,11 +146,10 @@ const styles = {
     cursor: "pointer",
     transition: "transform 0.2s",
     width: "280px",
-    minHeight: "360px", 
+    minHeight: "360px",
   },
   image: {
     width: "100%",
-    height: "160",
     objectFit: "cover",
     borderRadius: "12px",
     marginBottom: "12px",

@@ -54,7 +54,12 @@ const DiaryWrite = () => {
       const res = await fetch("http://localhost:4000/diaries/create", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ title, content }),
+        body: JSON.stringify({ 
+          title, 
+          content,
+          date,
+          group,
+        }),
       });
       await res.json();
       alert("일기 생성 완료!");

@@ -34,13 +34,13 @@ const MyPageForm = () => {
     const confirm = window.confirm("정말 탈퇴하시겠어요?");
     if (confirm) {
       try {
-        await axios.delete("http://localhost:4000/users/delete", {
+        await axios.delete("http://localhost:4000/users/me", {
           headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
+            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
           },
         });
         alert("회원 탈퇴가 완료되었습니다.");
-        localStorage.removeItem("token");
+        localStorage.removeItem("accessToken");
         navigate("/signup");
       } catch (err) {
         console.error("회원 탈퇴 실패:", err);

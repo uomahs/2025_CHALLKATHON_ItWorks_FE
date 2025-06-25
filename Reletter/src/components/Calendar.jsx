@@ -26,7 +26,7 @@ function Calendar() {
             },
           }
         );
-
+        // console.log("📦 count-by-date 응답:", res.data);
         setUnreadSummary(res.data);
       } catch (error) {
         console.error("❌ 읽지 않은 요약 불러오기 실패:", error);

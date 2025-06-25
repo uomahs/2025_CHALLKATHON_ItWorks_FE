@@ -70,34 +70,67 @@ const DiaryWrite = () => {
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     setImage(file);
-    setPreviewUrl(file ? URL.createObjectURL(file) : null);
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setPreviewUrl(reader.result); // 미리보기 URL 설정
+      };
+      reader.readAsDataURL(file);
+    } else {
+      setPreviewUrl(null);
+    }
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    console.log("날짜:", date);
-    console.log("선택된 그룹:", group);
+  const handleSubmit = async () => {
+    const formData = new FormData();
+    formData.append("title", title);
+    formData.append("content", content);
+    formData.append("date", date);
+    if (image) formData.append("image", image);
+
+    try {
+      const res = await axios.post("http://localhost:4000/diaries", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      });
+      console.log("저장 완료:", res.data);
+    } catch (err) {
+      console.error("저장 실패:", err);
+    }
   };
 
   const handleCreate = async () => {
     try {
       const token = localStorage.getItem("accessToken");
 
+      const formData = new FormData();
+      formData.append("title", title);
+      formData.append("content", content);
+      formData.append("date", date);
+      formData.append("group", group);
+      if (image) formData.append("image", image);
+      if (diaryId) formData.append("_id", diaryId); // 자동 저장된 ID 사용
+
       const res = await fetch("http://localhost:4000/diaries/create", {
         method: "POST",
         headers: { 
-          "Content-Type": "application/json",
+          // "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({ title, content, date, group, _id: diaryId }),
+        body: formData,
       });
 
-      if (res.status === 403) {
-      alert("접근 권한이 없습니다.");
-      return;
+      if (!res.ok) {
+        if (res.status === 403) {
+          alert("접근 권한이 없습니다.");
+          return;
+        }
+        throw new Error("서버 오류");
       }
 
-      await res.json();
+      const data = await res.json();
       alert("일기 생성 완료!");
       navigate("/main");
     } catch (err) {

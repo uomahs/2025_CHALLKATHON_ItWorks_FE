@@ -1,15 +1,15 @@
 import Header from "../components/Header";
-import DiaryByDate from "../components/DiaryByDate";
+import DiaryDetail from "../components/DiaryDetail";
 
-function Diary() {
+function Main() {
   return (
     <div>
       <Header />
       <div>
-        <DiaryByDate />
+        <DiaryDetail />
       </div>
     </div>
   );
 }
 
-export default Diary;
+export default Main;

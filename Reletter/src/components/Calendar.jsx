@@ -85,13 +85,10 @@ function Calendar() {
           }}
         >
           <NavButton onClick={prevMonth}>⬅</NavButton>
-          <h2 style={{ color: "#000000" }}>
-            {year}년 {month + 1}월
-          </h2>
+          <h2 style={{ color: "#000000" }}>{year}년 {month + 1}월</h2>
           <NavButton onClick={nextMonth}>➡</NavButton>
         </div>
 
-        {/* 요일 헤더 */}
         <div
           style={{
             display: "grid",
@@ -106,7 +103,6 @@ function Calendar() {
           ))}
         </div>
 
-        {/* 날짜 셀 */}
         <div
           style={{
             display: "grid",
@@ -117,11 +113,11 @@ function Calendar() {
           }}
         >
           {dates.map((day, index) => {
-            const formattedDate = `${year}-${String(month + 1).padStart(
-              2,
-              "0"
-            )}-${String(day).padStart(2, "0")}`;
+            const formattedDate = `${year}-${String(month + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
             const daySummary = unreadSummary[formattedDate];
+            const unreadCount = daySummary?.unreadCount || 0;
+            const readCount = daySummary?.readCount || 0;
+            const totalCount = daySummary?.totalCount || 0;
 
             return (
               <div
@@ -146,6 +142,8 @@ function Calendar() {
                     : hoveredIndex === index && day
                     ? "2px solid #d94673"
                     : "1px solid #eee",
+                  backgroundColor: isToday(day) ? "#fde8ec" : "#fff",
+                  border: isSelected(day) ? "2px solid #d94673" : "1px solid #eee",
                   borderRadius: "8px",
                   color: day ? "#333" : "transparent",
                   cursor: day ? "pointer" : "default",
@@ -162,41 +160,24 @@ function Calendar() {
                   transition: "all 0.2s ease-in-out",
                 }}
               >
-                <div style={{ fontWeight: "bold", fontSize: "16px" }}>
-                  {day || ""}
-                </div>
+                <div style={{ fontWeight: "bold", fontSize: "16px" }}>{day || ""}</div>
 
-                {day &&
-                  daySummary &&
-                  daySummary.totalCount > 0 &&
-                  daySummary.unreadCount > 0 && (
-                    <div
-                      style={{
-                        fontSize: "15px",
-                        color: "#d94673",
-                        paddingBottom: "25px",
-                      }}
-                    >
-                      💌 미열람 일기 {daySummary.unreadCount}개
-                    </div>
-                  )}
+                {day && totalCount > 0 && (
+                  <div style={{ fontSize: "15px", paddingBottom: "25px" }}>
+                    {readCount > 0 && (
+                      <div style={{ color: "#14b8a6" }}>
+                        👀 열람 일기 {readCount}개
+                      </div>
+                    )}
+                    {unreadCount > 0 && (
+                      <div style={{ color: "#d94673" }}>
+                        💌 미열람 일기 {unreadCount}개
+                      </div>
+                    )}
+                  </div>
+                )}
 
-                {day &&
-                  daySummary &&
-                  daySummary.totalCount > 0 &&
-                  daySummary.unreadCount === 0 && (
-                    <div
-                      style={{
-                        fontSize: "15px",
-                        color: "#d94673",
-                        paddingBottom: "25px",
-                      }}
-                    >
-                      ❤️ 일기 열람 완료
-                    </div>
-                  )}
-
-                {day && (!daySummary || daySummary.totalCount === 0) && (
+                {day && totalCount === 0 && (
                   <div
                     style={{
                       fontSize: "15px",

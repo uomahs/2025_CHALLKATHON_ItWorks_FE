@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useParams, useSearchParams } from "react-router-dom";
 import axios from "axios";
 import Header from "../components/Header";
-import DiaryComments from "../components/DiaryComments"; // 댓글 컴포넌트 import
+import DiaryComments from "../components/DiaryComments";
 
 const getLocalDateString = (dateObj) => {
   const offset = dateObj.getTimezoneOffset();
@@ -19,16 +19,17 @@ const DiaryDetail = () => {
   const { groupId } = useParams();
   const [searchParams] = useSearchParams();
 
-  const [date, setDate] = useState(""); // 선택된 날짜 상태
+  const [date, setDate] = useState("");
   const [diaries, setDiaries] = useState([]);
+  const [readCount, setReadCount] = useState(0);
+  const [unreadCount, setUnreadCount] = useState(0);
 
   useEffect(() => {
     const paramDate = searchParams.get("date");
     if (paramDate) {
       setDate(paramDate);
     } else {
-      const today = getLocalDateString(new Date());
-      setDate(today);
+      setDate(getLocalDateString(new Date()));
     }
   }, [searchParams]);
 
@@ -41,6 +42,7 @@ const DiaryDetail = () => {
           return;
         }
 
+        // 1. 일기 목록 조회
         const res = await axios.get(
           `http://localhost:4000/diaries/group/${groupId}?date=${date}`,
           {
@@ -50,7 +52,36 @@ const DiaryDetail = () => {
           }
         );
 
-        setDiaries(res.data);
+        const diaries = res.data;
+        setDiaries(diaries);
+
+        // 2. 읽음 통계 계산
+        const userEmail = JSON.parse(atob(token.split('.')[1])).email;
+        const read = diaries.filter((d) => d.readBy?.includes(userEmail)).length;
+        const unread = diaries.length - read;
+        setReadCount(read);
+        setUnreadCount(unread);
+
+        // 3. 자동 읽음 처리
+        await Promise.all(
+          diaries.map((diary) =>
+            axios
+              .post(
+                `http://localhost:4000/diaries/${diary._id}/read`,
+                {},
+                {
+                  headers: {
+                    Authorization: `Bearer ${token}`,
+                  },
+                }
+              )
+              .catch((err) =>
+                console.error(`❌ 일기 ${diary._id} 읽음 처리 실패`, err)
+              )
+          )
+        );
+
+        console.log("✅ 모든 일기 읽음 처리 완료");
       } catch (err) {
         console.error("❌ 그룹 일기 조회 실패:", err);
         alert("일기를 불러오는 데 실패했습니다.");
@@ -77,6 +108,11 @@ const DiaryDetail = () => {
       <div style={styles.wrapper}>
         <h1 style={styles.pageTitle}>📘 {formatDate(date)} </h1>
 
+        <p style={styles.summary}>
+          👀 열람 일기 {readCount}개&nbsp;&nbsp;&nbsp;
+          💌 미열람 일기 {unreadCount}개
+        </p>
+
         {diaries.length === 0 ? (
           <p style={styles.emptyMessage}>작성된 일기가 없습니다.</p>
         ) : (
@@ -101,7 +137,6 @@ const DiaryDetail = () => {
 
               <p style={styles.content}>{diary.content}</p>
 
-              {/* 댓글 컴포넌트 */}
               <DiaryComments diaryId={diary._id} />
             </div>
           ))
@@ -121,7 +156,13 @@ const styles = {
     fontSize: 28,
     textAlign: "center",
     color: "#d94673",
-    marginBottom: 30,
+    marginBottom: 12,
+  },
+  summary: {
+    fontSize: 16,
+    textAlign: "center",
+    color: "#555",
+    marginBottom: 28,
   },
   emptyMessage: {
     textAlign: "center",

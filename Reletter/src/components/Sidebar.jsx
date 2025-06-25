@@ -6,20 +6,15 @@ function Sidebar() {
   const [friends, setFriends] = useState([]);
   const navigate = useNavigate();
 
-  // ✅ 친구 목록 불러오기
   useEffect(() => {
+    const token = localStorage.getItem("accessToken");
+
     const fetchFriends = async () => {
       try {
         const res = await fetch("http://localhost:4000/users/friends/list", {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-          },
+          headers: { Authorization: `Bearer ${token}` },
         });
-
-        if (!res.ok) {
-          throw new Error("친구 목록을 불러오지 못했습니다.");
-        }
-
+        if (!res.ok) throw new Error("친구 목록 불러오기 실패");
         const data = await res.json();
         setFriends(data);
       } catch (err) {
@@ -27,39 +22,51 @@ function Sidebar() {
       }
     };
 
+    const fetchGroups = async () => {
+      try {
+        const res = await fetch("http://localhost:4000/users/groups/list", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        if (!res.ok) throw new Error("그룹 목록 불러오기 실패");
+        const data = await res.json();
+        setGroups(data);
+      } catch (err) {
+        console.error("❌ 그룹 목록 로딩 실패:", err);
+      }
+    };
+
     fetchFriends();
+    fetchGroups();
   }, []);
 
-  const addGroup = () => {
-    navigate("/Group");
-  };
-
-  const handleFindClick = () => {
-    navigate("/findfriend");
-  };
+  const addGroup = () => navigate("/Group");
+  const handleFindClick = () => navigate("/findfriend");
 
   return (
     <aside style={sidebarStyle}>
       <h3 style={sectionTitle}>📂 그룹</h3>
       <div style={sectionListStyle}>
-        {groups.length === 0 && (
+        {groups.length === 0 ? (
           <p style={emptyTextStyle}>아직 생성된 그룹이 없습니다.</p>
+        ) : (
+          groups.map((group) => (
+            <SidebarItem key={group._id} label={`💌 ${group.name}`} />
+          ))
         )}
-        {groups.map((group) => (
-          <SidebarItem key={group.id} label={`💌 ${group.name}`} />
-        ))}
         <button onClick={addGroup} style={addButtonStyle}>
           + 그룹 추가
         </button>
       </div>
+
       <h3 style={{ ...sectionTitle, marginTop: "24px" }}>👥 친구 목록</h3>
       <div style={{ ...sectionListStyle, flexGrow: 1 }}>
-        {friends.length === 0 && (
+        {friends.length === 0 ? (
           <p style={emptyTextStyle}>아직 추가된 친구가 없습니다.</p>
+        ) : (
+          friends.map((friend) => (
+            <SidebarItem key={friend.id} label={friend.name} />
+          ))
         )}
-        {friends.map((friend) => (
-          <SidebarItem key={friend.id} label={`${friend.name}`} />
-        ))}
         <button onClick={handleFindClick} style={addButtonStyle}>
           + 친구 찾기
         </button>

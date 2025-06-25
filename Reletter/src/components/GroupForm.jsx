@@ -5,12 +5,14 @@ function GroupForm({ onCreated }) {
   const [friends, setFriends] = useState([]);
   const [selectedFriends, setSelectedFriends] = useState([]);
   const [invitations, setInvitations] = useState([]);
+  const [myGroups, setMyGroups] = useState([]); // ✅ 내 그룹 목록
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         const token = localStorage.getItem("accessToken");
 
+        // 친구 목록
         const friendRes = await fetch(
           "http://localhost:4000/users/friends/list",
           {
@@ -21,6 +23,7 @@ function GroupForm({ onCreated }) {
         const friendsData = await friendRes.json();
         setFriends(friendsData);
 
+        // 받은 초대 목록
         const inviteRes = await fetch(
           "http://localhost:4000/users/groups/invitations",
           {
@@ -30,6 +33,17 @@ function GroupForm({ onCreated }) {
         if (!inviteRes.ok) throw new Error("초대 목록 불러오기 실패");
         const invitesData = await inviteRes.json();
         setInvitations(invitesData);
+
+        // 내가 속한 그룹 목록 ✅
+        const groupRes = await fetch(
+          "http://localhost:4000/users/groups/list",
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
+        if (!groupRes.ok) throw new Error("그룹 목록 불러오기 실패");
+        const groupData = await groupRes.json();
+        setMyGroups(groupData);
       } catch (err) {
         console.error("데이터 불러오기 실패:", err);
       }
@@ -44,7 +58,6 @@ function GroupForm({ onCreated }) {
     );
   };
 
-  // 초대 수락
   const acceptInvite = async (groupId) => {
     try {
       const token = localStorage.getItem("accessToken");
@@ -172,6 +185,29 @@ function GroupForm({ onCreated }) {
           그룹 생성
         </button>
       </form>
+
+      <div>
+        <h2 style={styles.group}>📂 내 그룹 목록</h2>
+        {myGroups.length === 0 ? (
+          <p style={styles.noInvites}>속한 그룹이 없습니다.</p>
+        ) : (
+          myGroups.map((group) => (
+            <div
+              key={group._id}
+              style={{
+                border: "1px solid #ccc",
+                padding: "10px",
+                borderRadius: "8px",
+                marginBottom: "10px",
+                backgroundColor: "#fefefe",
+              }}
+            >
+              <p>그룹명: <strong>{group.name}</strong></p>
+              <p>리더: {group.leader?.name || "알 수 없음"}</p>
+            </div>
+          ))
+        )}
+      </div>
 
       <div>
         <h2 style={styles.group}>📨 받은 그룹 초대</h2>

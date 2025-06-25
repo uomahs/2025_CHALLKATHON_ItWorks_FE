@@ -4,11 +4,15 @@ import axios from "axios";
 import Header from "../components/Header";
 import DiaryComments from "../components/DiaryComments"; // 댓글 컴포넌트 import
 
-// YYYY-MM-DD 형식으로 로컬 시간대를 문자열로 변환
 const getLocalDateString = (dateObj) => {
   const offset = dateObj.getTimezoneOffset();
   const localDate = new Date(dateObj.getTime() - offset * 60000);
   return localDate.toISOString().slice(0, 10);
+};
+
+const formatDate = (dateStr) => {
+  const [year, month, day] = dateStr.split("-");
+  return `${year}년 ${month}월 ${day}일`;
 };
 
 const DiaryDetail = () => {
@@ -18,7 +22,6 @@ const DiaryDetail = () => {
   const [date, setDate] = useState(""); // 선택된 날짜 상태
   const [diaries, setDiaries] = useState([]);
 
-  // 쿼리 파라미터에서 날짜 읽기, 없으면 오늘 날짜로 초기화
   useEffect(() => {
     const paramDate = searchParams.get("date");
     if (paramDate) {
@@ -29,7 +32,6 @@ const DiaryDetail = () => {
     }
   }, [searchParams]);
 
-  // groupId와 date 변경 시마다 일기 목록 API 호출
   useEffect(() => {
     const fetchGroupDiaries = async () => {
       try {
@@ -61,14 +63,19 @@ const DiaryDetail = () => {
   }, [groupId, date]);
 
   return (
-    <div style={{ backgroundColor: "#fff0f6", paddingBottom: "132px" }}>
+    <div
+      style={{
+        backgroundColor: "#fff0f6",
+        paddingBottom: "100%",
+      }}
+    >
       {/* Header는 div로 감싸 유지 */}
       <div>
         <Header />
       </div>
 
       <div style={styles.wrapper}>
-        <h1 style={styles.pageTitle}>📘 그룹 일기 목록 ({date})</h1>
+        <h1 style={styles.pageTitle}>📘 {formatDate(date)} </h1>
 
         {diaries.length === 0 ? (
           <p style={styles.emptyMessage}>작성된 일기가 없습니다.</p>

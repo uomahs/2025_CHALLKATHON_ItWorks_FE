@@ -1,20 +1,26 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
+// ✅ 로컬 기준 날짜 포맷 함수
+const getLocalDateString = (dateObj) => {
+  const offset = dateObj.getTimezoneOffset(); // 분 단위
+  const localDate = new Date(dateObj.getTime() - offset * 60000);
+  return localDate.toISOString().slice(0, 10);
+};
+
 const DiaryWrite = () => {
   const navigate = useNavigate();
-  const [diaryId, setDiaryId] = useState(null); // 자동 저장/임시 저장된 일기의 _id
+  const [diaryId, setDiaryId] = useState(null);
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [status, setStatus] = useState("");
-  const [date, setDate] = useState("");
+  const [date, setDate] = useState(() => getLocalDateString(new Date()));
   const [group, setGroup] = useState("");
   const [myGroups, setMyGroups] = useState([]);
   const [image, setImage] = useState(null);
   const [previewUrl, setPreviewUrl] = useState(null);
 
   useEffect(() => {
-    // 상태 불러오기
     fetch("http://localhost:4000/diaries/status")
       .then((res) => res.json())
       .then((data) => setStatus(data.status))
@@ -22,7 +28,6 @@ const DiaryWrite = () => {
   }, []);
 
   useEffect(() => {
-    // 그룹 목록 불러오기
     const fetchGroups = async () => {
       try {
         const token = localStorage.getItem("accessToken");
@@ -42,83 +47,56 @@ const DiaryWrite = () => {
   }, []);
 
   useEffect(() => {
-    // 자동 저장
     const autoSave = setInterval(async () => {
       try {
         const token = localStorage.getItem("accessToken");
 
         const res = await fetch("http://localhost:4000/diaries/auto-save", {
           method: "POST",
-          headers: { 
+          headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
           },
-          body: JSON.stringify({ title, content }),
+          body: JSON.stringify({ title, content, date }),
         });
 
         const data = await res.json();
-        setDiaryId(data.diary?._id); // <- 자동 저장된 일기 ID 기억
+        setDiaryId(data.diary?._id);
         console.log("자동 저장됨");
-
       } catch (err) {
         console.error("자동 저장 실패:", err);
       }
     }, 150000);
+
     return () => clearInterval(autoSave);
-  }, [title, content]);
+  }, [title, content, date]);
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     setImage(file);
     if (file) {
       const reader = new FileReader();
-      reader.onloadend = () => {
-        setPreviewUrl(reader.result); // 미리보기 URL 설정
-      };
+      reader.onloadend = () => setPreviewUrl(reader.result);
       reader.readAsDataURL(file);
     } else {
       setPreviewUrl(null);
     }
   };
 
-  const handleSubmit = async () => {
-    const formData = new FormData();
-    formData.append("title", title);
-    formData.append("content", content);
-    formData.append("date", date);
-    if (image) formData.append("image", image);
-
-    try {
-      const res = await axios.post("http://localhost:4000/diaries", formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-      });
-      console.log("저장 완료:", res.data);
-    } catch (err) {
-      console.error("저장 실패:", err);
-    }
-  };
-
   const handleCreate = async () => {
     try {
       const token = localStorage.getItem("accessToken");
-
       const formData = new FormData();
       formData.append("title", title);
       formData.append("content", content);
       formData.append("date", date);
       formData.append("group", group);
       if (image) formData.append("image", image);
-      if (diaryId) formData.append("_id", diaryId); // 자동 저장된 ID 사용
+      if (diaryId) formData.append("_id", diaryId);
 
       const res = await fetch("http://localhost:4000/diaries/create", {
         method: "POST",
-        headers: { 
-          // "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
+        headers: { Authorization: `Bearer ${token}` },
         body: formData,
       });
 
@@ -130,7 +108,6 @@ const DiaryWrite = () => {
         throw new Error("서버 오류");
       }
 
-      const data = await res.json();
       alert("일기 생성 완료!");
       navigate("/main");
     } catch (err) {
@@ -145,26 +122,23 @@ const DiaryWrite = () => {
 
       const res = await fetch("http://localhost:4000/diaries/temp", {
         method: "POST",
-        headers: { 
+        headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({ title, content }),
+        body: JSON.stringify({ title, content, date }),
       });
 
       const data = await res.json();
-      setDiaryId(data.diary?._id); // <- 임시 저장된 일기 ID 기억
+      setDiaryId(data.diary?._id);
       alert("임시 저장 완료");
-      console.log("임시 저장 완료");
     } catch (err) {
       console.error("임시 저장 오류:", err);
       alert("임시 저장 실패");
     }
   };
 
-  const handleReturnClick = () => {
-    navigate("/main");
-  };
+  const handleReturnClick = () => navigate("/main");
 
   return (
     <div style={styles.page}>
@@ -189,7 +163,11 @@ const DiaryWrite = () => {
             <img
               src={previewUrl}
               alt="preview"
-              style={{ marginTop: "1rem", width: "100%", borderRadius: "12px" }}
+              style={{
+                marginTop: "1rem",
+                width: "100%",
+                borderRadius: "12px",
+              }}
             />
           )}
         </div>
@@ -197,13 +175,15 @@ const DiaryWrite = () => {
         <div style={styles.container}>
           <h2 style={styles.title}>📓 일기 작성</h2>
 
-          <form onSubmit={handleSubmit} style={styles.form}>
+          <form onSubmit={(e) => e.preventDefault()} style={styles.form}>
             <label style={styles.label}>
               날짜 선택:
               <input
                 type="date"
                 value={date}
-                onChange={(e) => setDate(e.target.value)}
+                onChange={(e) =>
+                  setDate(getLocalDateString(new Date(e.target.value)))
+                }
                 required
                 style={styles.input}
               />
@@ -260,6 +240,7 @@ const DiaryWrite = () => {
   );
 };
 
+// ✅ styles 객체는 기존과 동일하게 유지
 const styles = {
   page: {
     backgroundColor: "#fff0f6",

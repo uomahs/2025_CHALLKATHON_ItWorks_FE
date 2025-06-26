@@ -126,8 +126,12 @@ function Calendar() {
             const readCount = daySummary?.readCount || 0;
             const totalCount = daySummary?.totalCount || 0;
 
-            const isFuture = new Date(formattedDate) > new Date(new Date().setHours(0, 0, 0, 0));
-            console.log(`📅 ${formattedDate} isFuture: ${isFuture}, unread: ${unreadCount}`);
+            const isFuture =
+              new Date(formattedDate) >
+              new Date(new Date().setHours(0, 0, 0, 0));
+            console.log(
+              `📅 ${formattedDate} isFuture: ${isFuture}, unread: ${unreadCount}`
+            );
 
             return (
               <div
@@ -199,13 +203,8 @@ function Calendar() {
                     {unreadCount > 0 && (
                       <div style={{ color: isFuture ? "#d94673" : "#d94673" }}>
                         {isFuture
-<<<<<<< HEAD
                           ? `⭐️ 곧 만날 일기 ${unreadCount}개`
                           : `💌 미열람 일기 ${unreadCount}개`}
-=======
-                          ? `❓ 곧 만날 일기 ${unreadCount}개`
-                          : `💌 미열람 일기 ${unreadCount}  개`}
->>>>>>> b84499d (캘린더 일기 수정)
                       </div>
                     )}
                   </div>

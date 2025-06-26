@@ -7,6 +7,10 @@ const DiaryByDate = () => {
   const navigate = useNavigate();
   const [groupPreviews, setGroupPreviews] = useState([]);
 
+  const [showPasswordPrompt, setShowPasswordPrompt] = useState(false);
+  const [inputPassword, setInputPassword] = useState("");
+  const [pendingGroupId, setPendingGroupId] = useState(null);
+
   const isFutureDate = (dateStr) => {
     const today = new Date();
     const target = new Date(dateStr);
@@ -17,7 +21,7 @@ const DiaryByDate = () => {
 
   useEffect(() => {
     const fetchData = async () => {
-      if (isFutureDate(date)) return; // 미래일 경우 아예 요청 안 함
+      if (isFutureDate(date)) return;
 
       try {
         const token = localStorage.getItem("accessToken");
@@ -104,6 +108,8 @@ const DiaryByDate = () => {
           </div>
         ) : (
           groupPreviews.map((group) => {
+            console.log("📦 group:", group);
+
             const diary = group.entries[0];
             if (!diary) return null;
 
@@ -113,13 +119,20 @@ const DiaryByDate = () => {
                 : `http://localhost:4000${diary.imageUrl}`
               : "/close.png";
 
+            const groupId = group.id || group._id;
+
             return (
               <div
-                key={group.id || group._id}
+                key={groupId}
                 style={styles.groupBox}
-                onClick={() =>
-                  navigate(`/diary/group/${group.id || group._id}?date=${date}`)
-                }
+                onClick={() => {
+                  if (!group.hasPassword) {
+                    navigate(`/diary/group/${groupId}?date=${date}`);
+                  } else {
+                    setPendingGroupId(groupId);
+                    setShowPasswordPrompt(true);
+                  }
+                }}
               >
                 <h3 style={styles.groupTitle}>{group.groupName}</h3>
 
@@ -145,6 +158,67 @@ const DiaryByDate = () => {
           })
         )}
       </div>
+
+      {/* ✅ 비밀번호 입력 모달 */}
+      {showPasswordPrompt && (
+        <div
+          style={{
+            position: "fixed",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            backgroundColor: "#fff",
+            padding: "24px",
+            borderRadius: "12px",
+            boxShadow: "0 0 10px rgba(0,0,0,0.2)",
+            zIndex: 1000,
+            width: "300px",
+          }}
+        >
+          <h3>비밀번호 입력</h3>
+          <input
+            type="password"
+            value={inputPassword}
+            onChange={(e) => setInputPassword(e.target.value)}
+            placeholder="그룹 비밀번호"
+            style={{ padding: "8px", marginBottom: "12px", width: "100%" }}
+          />
+          <div>
+            <button
+              onClick={async () => {
+                try {
+                  const token = localStorage.getItem("accessToken");
+                  await axios.post(
+                    `http://localhost:4000/users/groups/${pendingGroupId}/verify-password`,
+                    { password: inputPassword },
+                    { headers: { Authorization: `Bearer ${token}` } }
+                  );
+
+                  // ✅ 인증 후에도 저장 없이 바로 이동
+                  setShowPasswordPrompt(false);
+                  setInputPassword("");
+                  navigate(`/diary/group/${pendingGroupId}?date=${date}`);
+                } catch (err) {
+                  alert("❌ 비밀번호가 틀렸습니다.");
+                  console.error(err);
+                }
+              }}
+              style={{ marginRight: "8px" }}
+            >
+              확인
+            </button>
+            <button
+              onClick={() => {
+                setShowPasswordPrompt(false);
+                setInputPassword("");
+                setPendingGroupId(null);
+              }}
+            >
+              취소
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

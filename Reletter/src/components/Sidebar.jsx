@@ -115,7 +115,9 @@ function Sidebar() {
   };
 
   const handleDeleteGroup = async (groupId) => {
-    const confirm = window.confirm("이 그룹을 정말로 삭제하시겠습니까?");
+    const confirm = window.confirm(
+      "정말로 이 그룹을 삭제하시겠습니까?\n\n❗ 그룹 내 작성된 일기도 모두 삭제됩니다."
+    );
     if (!confirm) return;
 
     try {

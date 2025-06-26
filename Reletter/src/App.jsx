@@ -10,6 +10,7 @@ import FindFriend from "./pages/FindFriend";
 import MyPage from "./pages/MyPage";
 import DiaryDetail from "./pages/DiaryDetail";
 import Diary from "./pages/Diary";
+import DiaryEdit from "./pages/DiaryEdit";
 
 function App() {
   return (
@@ -26,6 +27,7 @@ function App() {
       <Route path="/diary/:date" element={<Diary />} />
       <Route path="/diary/detail/:id" element={<DiaryDetail />} />
       <Route path="/diary/group/:groupId" element={<DiaryDetail />} />
+      <Route path="/diary/edit/:id" element={<DiaryEdit />} />
 
     </Routes>
   );

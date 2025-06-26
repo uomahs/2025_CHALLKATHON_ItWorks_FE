@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useParams, useSearchParams } from "react-router-dom";
+import { useParams, useNavigate, useSearchParams } from "react-router-dom";
 import axios from "axios";
 import Header from "../components/Header";
 import DiaryComments from "../components/DiaryComments";
@@ -18,12 +18,66 @@ const formatDate = (dateStr) => {
 const DiaryDetail = () => {
   const { groupId } = useParams();
   const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
 
   const [date, setDate] = useState("");
   const [diaries, setDiaries] = useState([]);
   const [readCount, setReadCount] = useState(0);
   const [unreadCount, setUnreadCount] = useState(0);
 
+  const token = localStorage.getItem("accessToken");
+  const userEmail = token ? JSON.parse(atob(token.split(".")[1])).email : null;
+
+  // 일기 목록 조회 함수 (재사용 가능하도록 분리)
+  const fetchGroupDiaries = async () => {
+    try {
+      if (!token) {
+        alert("로그인이 필요합니다.");
+        return;
+      }
+
+      const res = await axios.get(
+        `http://localhost:4000/diaries/group/${groupId}?date=${date}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      const diaries = res.data;
+      setDiaries(diaries);
+
+      // 읽음 통계 계산
+      const read = diaries.filter((d) => d.readBy?.includes(userEmail)).length;
+      const unread = diaries.length - read;
+      setReadCount(read);
+      setUnreadCount(unread);
+
+      // 자동 읽음 처리
+      await Promise.all(
+        diaries.map((diary) =>
+          axios.post(
+            `http://localhost:4000/diaries/${diary._id}/read`,
+            {},
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            }
+          ).catch((err) =>
+            console.error(`❌ 일기 ${diary._id} 읽음 처리 실패`, err)
+          )
+        )
+      );
+
+    } catch (err) {
+      console.error("❌ 그룹 일기 조회 실패:", err);
+      alert("일기를 불러오는 데 실패했습니다.");
+    }
+  };
+
+  // 검색 파라미터에서 날짜 추출 (초기 세팅)
   useEffect(() => {
     const paramDate = searchParams.get("date");
     if (paramDate) {
@@ -33,65 +87,31 @@ const DiaryDetail = () => {
     }
   }, [searchParams]);
 
+  // 날짜 또는 groupId 변경 시 일기 목록 재조회
   useEffect(() => {
-    const fetchGroupDiaries = async () => {
-      try {
-        const token = localStorage.getItem("accessToken");
-        if (!token) {
-          alert("로그인이 필요합니다.");
-          return;
-        }
-
-        // 1. 일기 목록 조회
-        const res = await axios.get(
-          `http://localhost:4000/diaries/group/${groupId}?date=${date}`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-
-        const diaries = res.data;
-        setDiaries(diaries);
-
-        // 2. 읽음 통계 계산
-        const userEmail = JSON.parse(atob(token.split('.')[1])).email;
-        const read = diaries.filter((d) => d.readBy?.includes(userEmail)).length;
-        const unread = diaries.length - read;
-        setReadCount(read);
-        setUnreadCount(unread);
-
-        // 3. 자동 읽음 처리
-        await Promise.all(
-          diaries.map((diary) =>
-            axios
-              .post(
-                `http://localhost:4000/diaries/${diary._id}/read`,
-                {},
-                {
-                  headers: {
-                    Authorization: `Bearer ${token}`,
-                  },
-                }
-              )
-              .catch((err) =>
-                console.error(`❌ 일기 ${diary._id} 읽음 처리 실패`, err)
-              )
-          )
-        );
-
-        console.log("✅ 모든 일기 읽음 처리 완료");
-      } catch (err) {
-        console.error("❌ 그룹 일기 조회 실패:", err);
-        alert("일기를 불러오는 데 실패했습니다.");
-      }
-    };
-
     if (groupId && date) {
       fetchGroupDiaries();
     }
   }, [groupId, date]);
+
+  // 삭제 처리 함수
+  const handleDelete = async (diaryId) => {
+    if (!window.confirm("정말 삭제하시겠습니까?")) return;
+
+    try {
+      await axios.delete(`http://localhost:4000/diaries/${diaryId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      alert("삭제 완료!");
+      // 삭제 후 최신 목록 재조회
+      await fetchGroupDiaries();
+    } catch (err) {
+      console.error("❌ 삭제 실패", err);
+      alert("삭제 중 오류 발생");
+    }
+  };
 
   return (
     <div
@@ -100,7 +120,6 @@ const DiaryDetail = () => {
         paddingBottom: "100%",
       }}
     >
-      {/* Header는 div로 감싸 유지 */}
       <div>
         <Header />
       </div>
@@ -136,6 +155,37 @@ const DiaryDetail = () => {
               )}
 
               <p style={styles.content}>{diary.content}</p>
+
+              {diary.user?.email === userEmail && (
+                <div style={{ display: "flex", gap: "8px", marginTop: "16px" }}>
+                  <button
+                    onClick={() => navigate(`/diary/edit/${diary._id}`)}
+                    style={{
+                      padding: "6px 12px",
+                      backgroundColor: "#fcd34d",
+                      border: "none",
+                      borderRadius: "6px",
+                      cursor: "pointer",
+                    }}
+                  >
+                    ✏️ 수정
+                  </button>
+
+                  <button
+                    onClick={() => handleDelete(diary._id)}
+                    style={{
+                      padding: "6px 12px",
+                      backgroundColor: "#f87171",
+                      border: "none",
+                      borderRadius: "6px",
+                      color: "white",
+                      cursor: "pointer",
+                    }}
+                  >
+                    🗑 삭제
+                  </button>
+                </div>
+              )}
 
               <DiaryComments diaryId={diary._id} />
             </div>

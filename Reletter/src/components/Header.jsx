@@ -11,7 +11,7 @@ function Header() {
   return (
     <header
       style={{
-        height: "60px",
+        height: "65px",
         backgroundColor: "#fdf2f8",
         display: "flex",
         alignItems: "center",

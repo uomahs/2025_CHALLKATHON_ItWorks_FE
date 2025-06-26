@@ -47,6 +47,7 @@ const styles = {
     fontWeight: "bold",
   },
   returnButton: {
+    textAlign: "center",
     justifyContent: "center",
     width: "150px",
     padding: "12px",
@@ -89,14 +90,14 @@ const Login = () => {
         },
         body: JSON.stringify(data),
       });
-  
+
       const result = await res.json();
-  
+
       if (!res.ok) {
         alert(result.message || "로그인 실패");
         return;
       }
-  
+
       // 정상 로그인 처리
       alert("로그인 성공!");
       localStorage.setItem("accessToken", result.token);
@@ -109,6 +110,9 @@ const Login = () => {
 
   const handleReturnClick = () => {
     navigate("/home");
+  };
+  const handleSignupClick = () => {
+    navigate("/signup");
   };
 
   return (
@@ -147,6 +151,16 @@ const Login = () => {
         >
           이전 화면으로
         </button>
+        <div
+          style={{
+            color: "#ec4899",
+            textAlign: "center",
+            textDecoration: "underline",
+          }}
+          onClick={handleSignupClick}
+        >
+          회원가입
+        </div>
       </form>
     </div>
   );

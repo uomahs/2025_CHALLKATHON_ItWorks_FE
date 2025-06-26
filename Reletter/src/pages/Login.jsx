@@ -83,27 +83,41 @@ const Login = () => {
 
   const onSubmit = async (data) => {
     try {
-      const res = await fetch("${process.env.REACT_APP_API_URL}/users/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data),
-      });
+      const res = await fetch(
+        `${process.env.REACT_APP_API_URL}/users/login`, // ✅ 백틱 사용
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(data),
+        }
+      );
 
-      const result = await res.json();
+      const text = await res.text(); // text로 응답 먼저 받기
+      let result = null;
+
+      try {
+        result = JSON.parse(text); // 수동으로 JSON 파싱
+      } catch (err) {
+        console.error("⚠️ JSON 파싱 실패:", text);
+      }
 
       if (!res.ok) {
-        alert(result.message || "로그인 실패");
+        alert(result?.message || "로그인 실패");
         return;
       }
 
-      // 정상 로그인 처리
+      if (!result || !result.token) {
+        alert("서버 응답 오류: 토큰 없음");
+        return;
+      }
+
       alert("로그인 성공!");
       localStorage.setItem("accessToken", result.token);
       navigate("/main");
     } catch (error) {
-      console.error("에러 발생:", error);
+      console.error("❌ 에러 발생:", error);
       alert("서버 오류로 로그인 실패");
     }
   };
@@ -111,6 +125,7 @@ const Login = () => {
   const handleReturnClick = () => {
     navigate("/home");
   };
+
   const handleSignupClick = () => {
     navigate("/signup");
   };

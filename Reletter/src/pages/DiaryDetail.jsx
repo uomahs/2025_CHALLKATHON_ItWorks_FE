@@ -37,7 +37,7 @@ const DiaryDetail = () => {
       }
 
       const res = await axios.get(
-        `http://localhost:4000/diaries/group/${groupId}?date=${date}`,
+        `${process.env.REACT_APP_API_URL}/diaries/group/${groupId}?date=${date}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -59,7 +59,7 @@ const DiaryDetail = () => {
         diaries.map((diary) =>
           axios
             .post(
-              `http://localhost:4000/diaries/${diary._id}/read`,
+              `${process.env.REACT_APP_API_URL}/diaries/${diary._id}/read`,
               {},
               {
                 headers: {
@@ -100,7 +100,7 @@ const DiaryDetail = () => {
     if (!window.confirm("정말 삭제하시겠습니까?")) return;
 
     try {
-      await axios.delete(`http://localhost:4000/diaries/${diaryId}`, {
+      await axios.delete(`${process.env.REACT_APP_API_URL}/diaries/${diaryId}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -145,7 +145,8 @@ const DiaryDetail = () => {
 
               {diary.imageUrl && (
                 <img
-                  src={`http://localhost:4000${diary.imageUrl}`}
+                  src={`${process.env.REACT_APP_API_URL}
+                  ${diary.imageUrl}`}
                   alt="diary-img"
                   style={styles.image}
                   onError={(e) => {

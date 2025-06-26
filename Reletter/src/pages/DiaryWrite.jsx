@@ -21,7 +21,7 @@ const DiaryWrite = () => {
   const [previewUrl, setPreviewUrl] = useState(null);
 
   useEffect(() => {
-    fetch("http://localhost:4000/diaries/status")
+    fetch("${process.env.REACT_APP_API_URL}/diaries/status")
       .then((res) => res.json())
       .then((data) => setStatus(data.status))
       .catch((err) => console.error("상태 불러오기 오류:", err));
@@ -31,7 +31,7 @@ const DiaryWrite = () => {
     const fetchGroups = async () => {
       try {
         const token = localStorage.getItem("accessToken");
-        const res = await fetch("http://localhost:4000/users/groups/list", {
+        const res = await fetch("${process.env.REACT_APP_API_URL}/users/groups/list", {
           headers: { Authorization: `Bearer ${token}` },
         });
 
@@ -51,7 +51,7 @@ const DiaryWrite = () => {
       try {
         const token = localStorage.getItem("accessToken");
 
-        const res = await fetch("http://localhost:4000/diaries/auto-save", {
+        const res = await fetch("${process.env.REACT_APP_API_URL}/diaries/auto-save", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -94,7 +94,7 @@ const DiaryWrite = () => {
       if (image) formData.append("image", image);
       if (diaryId) formData.append("_id", diaryId);
 
-      const res = await fetch("http://localhost:4000/diaries/create", {
+      const res = await fetch("${process.env.REACT_APP_API_URL}/diaries/create", {
         method: "POST",
         headers: { Authorization: `Bearer ${token}` },
         body: formData,
@@ -120,7 +120,7 @@ const DiaryWrite = () => {
     try {
       const token = localStorage.getItem("accessToken");
 
-      const res = await fetch("http://localhost:4000/diaries/temp", {
+      const res = await fetch("${process.env.REACT_APP_API_URL}/diaries/temp", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

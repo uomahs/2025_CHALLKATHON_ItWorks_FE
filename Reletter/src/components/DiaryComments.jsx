@@ -10,7 +10,8 @@ const DiaryComments = ({ diaryId }) => {
     try {
       const token = localStorage.getItem("accessToken");
       const res = await axios.get(
-        `http://localhost:4000/diaries/${diaryId}/comments`,
+        `${process.env.REACT_APP_API_URL}
+/diaries/${diaryId}/comments`,
         {
           headers: { Authorization: `Bearer ${token}` },
         }
@@ -34,7 +35,8 @@ const DiaryComments = ({ diaryId }) => {
     try {
       const token = localStorage.getItem("accessToken");
       await axios.post(
-        `http://localhost:4000/diaries/${diaryId}/comments`,
+        `${process.env.REACT_APP_API_URL}
+/diaries/${diaryId}/comments`,
         { content: commentInput.trim() },
         {
           headers: { Authorization: `Bearer ${token}` },

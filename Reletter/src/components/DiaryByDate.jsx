@@ -52,7 +52,8 @@ const DiaryByDate = () => {
         }
 
         const res = await axios.get(
-          `http://localhost:4000/diaries/date/${date}`,
+          `${process.env.REACT_APP_API_URL}
+/diaries/date/${date}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -69,7 +70,8 @@ const DiaryByDate = () => {
 
             try {
               const readRes = await axios.get(
-                `http://localhost:4000/diaries/${diary.id}/read`,
+                `${process.env.REACT_APP_API_URL}
+/diaries/${diary.id}/read`,
                 {
                   headers: {
                     Authorization: `Bearer ${token}`,
@@ -137,7 +139,8 @@ const DiaryByDate = () => {
             const imageSrc = diary.imageUrl
               ? diary.imageUrl.startsWith("http")
                 ? `${diary.imageUrl}?t=${new Date().getTime()}`
-                : `http://localhost:4000${diary.imageUrl}`
+                : `${process.env.REACT_APP_API_URL}
+                ${diary.imageUrl}`
               : "/close.png";
 
             const groupId = group.id || group._id;
@@ -209,7 +212,8 @@ const DiaryByDate = () => {
                 try {
                   const token = localStorage.getItem("accessToken");
                   await axios.post(
-                    `http://localhost:4000/users/groups/${pendingGroupId}/verify-password`,
+                    `${process.env.REACT_APP_API_URL}
+/users/groups/${pendingGroupId}/verify-password`,
                     { password: inputPassword },
                     { headers: { Authorization: `Bearer ${token}` } }
                   );

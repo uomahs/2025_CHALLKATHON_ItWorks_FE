@@ -14,7 +14,7 @@ function GroupForm({ onCreated }) {
 
         // 친구 목록
         const friendRes = await fetch(
-          "http://localhost:4000/users/friends/list",
+          "${process.env.REACT_APP_API_URL}/users/friends/list",
           {
             headers: { Authorization: `Bearer ${token}` },
           }
@@ -25,7 +25,7 @@ function GroupForm({ onCreated }) {
 
         // 받은 초대 목록
         const inviteRes = await fetch(
-          "http://localhost:4000/users/groups/invitations",
+          "${process.env.REACT_APP_API_URL}/users/groups/invitations",
           {
             headers: { Authorization: `Bearer ${token}` },
           }
@@ -36,7 +36,7 @@ function GroupForm({ onCreated }) {
 
         // 내가 속한 그룹 목록 ✅
         const groupRes = await fetch(
-          "http://localhost:4000/users/groups/list",
+          "${process.env.REACT_APP_API_URL}/users/groups/list",
           {
             headers: { Authorization: `Bearer ${token}` },
           }
@@ -62,7 +62,7 @@ function GroupForm({ onCreated }) {
     try {
       const token = localStorage.getItem("accessToken");
       const res = await fetch(
-        `http://localhost:4000/users/groups/${groupId}/accept`,
+        `${process.env.REACT_APP_API_URL}/users/groups/${groupId}/accept`,
         {
           method: "POST",
           headers: { Authorization: `Bearer ${token}` },
@@ -81,7 +81,7 @@ function GroupForm({ onCreated }) {
     try {
       const token = localStorage.getItem("accessToken");
       const res = await fetch(
-        `http://localhost:4000/users/groups/${groupId}/reject`,
+        `${process.env.REACT_APP_API_URL}/users/groups/${groupId}/reject`,
         {
           method: "POST",
           headers: { Authorization: `Bearer ${token}` },
@@ -103,7 +103,7 @@ function GroupForm({ onCreated }) {
 
     try {
       const token = localStorage.getItem("accessToken");
-      const res = await fetch("http://localhost:4000/users/groups", {
+      const res = await fetch("${process.env.REACT_APP_API_URL}/users/groups", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -118,7 +118,7 @@ function GroupForm({ onCreated }) {
       const groupId = result.groupId;
 
       const inviteRes = await fetch(
-        `http://localhost:4000/users/groups/${groupId}/invite`,
+        `${process.env.REACT_APP_API_URL}/users/groups/${groupId}/invite`,
         {
           method: "POST",
           headers: {

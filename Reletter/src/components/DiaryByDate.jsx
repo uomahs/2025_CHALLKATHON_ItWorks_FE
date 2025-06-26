@@ -148,7 +148,7 @@ const DiaryByDate = () => {
 
                 <p style={styles.title}>{diary.previewText}</p>
                 <p style={styles.readBy}>
-                  일기를 펼쳐본 사람 👀 :{" "}
+                  일기를 펼쳐본 사람 👀 : <br></br>{" "}
                   {diary.readBy?.length > 0
                     ? diary.readBy.join(", ")
                     : "아직 없음"}
@@ -275,6 +275,7 @@ const styles = {
   readBy: {
     fontSize: "16px",
     color: "#6b7280",
+    textAlign: "center",
   },
   futureBox: {
     backgroundColor: "#ffffff",

@@ -11,7 +11,7 @@ function Header() {
   return (
     <header
       style={{
-        height: "60px",
+        height: "65px",
         backgroundColor: "#fdf2f8",
         display: "flex",
         alignItems: "center",
@@ -34,13 +34,13 @@ function Header() {
         <img
           src="/reletter_logo.png"
           alt="Reletter 로고"
-          style={{ height: "40px" }}
+          style={{ height: "45px" }}
         />
         <span
           style={{
-            marginTop: "16px",
+            marginTop: "15px",
             fontWeight: "800",
-            fontSize: "30px",
+            fontSize: "35px",
             color: "#9d174d",
           }}
         >

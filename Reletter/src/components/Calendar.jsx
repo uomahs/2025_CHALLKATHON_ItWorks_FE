@@ -135,18 +135,20 @@ function Calendar() {
                 onClick={() => {
                   if (!day) return;
 
+                  if (totalCount === 0 && isFuture) {
+                    alert("작성된 일기가 없습니다.");
+                    return;
+                  }
+
                   if (isFuture) {
                     const tomorrow = new Date(formattedDate);
                     tomorrow.setDate(tomorrow.getDate() + 1);
 
-                    const year = tomorrow.getFullYear();
-                    const month = String(tomorrow.getMonth() + 1).padStart(
-                      2,
-                      "0"
-                    );
-                    const date = String(tomorrow.getDate()).padStart(2, "0");
+                    const y = tomorrow.getFullYear();
+                    const m = String(tomorrow.getMonth() + 1).padStart(2, "0");
+                    const d = String(tomorrow.getDate()).padStart(2, "0");
 
-                    alert(`${year}년 ${month}월 ${date}일에 만나요!`);
+                    alert(`${y}년 ${m}월 ${d}일에 만나요!`);
                     return;
                   }
 
@@ -197,7 +199,7 @@ function Calendar() {
                     {unreadCount > 0 && (
                       <div style={{ color: isFuture ? "#d94673" : "#d94673" }}>
                         {isFuture
-                          ? `❓ 곧 만날 일기 ${unreadCount}개`
+                          ? `⭐️ 곧 만날 일기 ${unreadCount}개`
                           : `💌 미열람 일기 ${unreadCount}개`}
                       </div>
                     )}

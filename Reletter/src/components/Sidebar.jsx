@@ -10,11 +10,16 @@ function Sidebar() {
   const [newPassword, setNewPassword] = useState("");
   const [currentUserId, setCurrentUserId] = useState(null);
 
-  const isLeader =
-    selectedGroup && currentUserId &&
-    String(selectedGroup.leader?._id || selectedGroup.leader) === String(currentUserId);
-
   const navigate = useNavigate();
+
+  useEffect(() => {
+    console.log("🟡 currentUserId", currentUserId);
+  }, [currentUserId]);
+  
+  useEffect(() => {
+    console.log("🟣 selectedGroup", selectedGroup);
+  }, [selectedGroup]);
+  
 
   useEffect(() => {
     const token = localStorage.getItem("accessToken");
@@ -66,7 +71,8 @@ function Sidebar() {
   const handleFindClick = () => navigate("/findfriend");
 
   const handleDeleteFriend = async (friendId) => {
-    if (!window.confirm("정말로 이 친구를 삭제하시겠습니까?")) return;
+    const confirm = window.confirm("정말로 이 친구를 삭제하시겠습니까?");
+    if (!confirm) return;
 
     try {
       const token = localStorage.getItem("accessToken");
@@ -87,7 +93,8 @@ function Sidebar() {
   };
 
   const handleRemoveMember = async (groupId, memberId) => {
-    if (!window.confirm("정말로 이 구성원을 삭제하시겠습니까?")) return;
+    const confirm = window.confirm("정말로 이 구성원을 삭제하시겠습니까?");
+    if (!confirm) return;
 
     try {
       const token = localStorage.getItem("accessToken");
@@ -110,6 +117,8 @@ function Sidebar() {
   };
 
   const handleDeleteGroup = async (groupId) => {
+    const confirm = window.confirm("이 그룹을 정말로 삭제하시겠습니까?");
+    if (!confirm) return;
     if (!window.confirm("정말로 이 그룹을 삭제하시겠습니까?\n\n❗ 그룹 내 작성된 일기도 모두 삭제됩니다.")) return;
 
     try {
@@ -184,9 +193,11 @@ function Sidebar() {
                 setShowPasswordForm(false);
                 setNewPassword("");
               }}
+              style={closeButtonStyle}
             >
               ✖︎
             </button>
+            
           </div>
 
           {selectedFriend && (
@@ -194,15 +205,7 @@ function Sidebar() {
               <p><strong>이름:</strong> {selectedFriend.name}</p>
               <p><strong>이메일:</strong> {selectedFriend.email}</p>
               <button
-                style={{
-                  marginTop: "10px",
-                  padding: "6px 12px",
-                  backgroundColor: "#f87171",
-                  color: "white",
-                  border: "none",
-                  borderRadius: "6px",
-                  cursor: "pointer"
-                }}
+                style={{ marginTop: "10px", padding: "6px 12px", backgroundColor: "#f87171", color: "white", border: "none", borderRadius: "6px", cursor: "pointer" }}
                 onClick={() => handleDeleteFriend(selectedFriend.id)}
               >친구 삭제</button>
             </div>
@@ -216,7 +219,7 @@ function Sidebar() {
                 {selectedGroup.members?.map((m) => (
                   <li key={m._id || m.id} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "4px" }}>
                     <span>{m.name}</span>
-                    {isLeader && String(m._id || m.id) !== String(currentUserId) && (
+                    {String(m._id || m.id) !== String(currentUserId) && (
                       <button
                         onClick={() => handleRemoveMember(selectedGroup._id, m._id || m.id)}
                         style={{ background: "#fca5a5", border: "none", borderRadius: "4px", color: "white", padding: "2px 6px", cursor: "pointer", fontSize: "12px" }}
@@ -226,81 +229,78 @@ function Sidebar() {
                 ))}
               </ul>
 
-              {isLeader && (
-                <>
-                  <p
+              <p
+                style={{
+                  marginTop: "8px",
+                  fontSize: "14px",
+                  color: "#9d174d",
+                  cursor: "pointer",
+                  textDecoration: "underline",
+                }}
+                onClick={() => setShowPasswordForm(true)}
+              >
+                🔐 비밀번호 설정
+              </p>
+
+              {showPasswordForm && (
+                <div style={{ marginTop: "8px" }}>
+                  <input
+                    type="password"
+                    value={newPassword}
+                    onChange={(e) => setNewPassword(e.target.value)}
+                    placeholder="새 비밀번호"
                     style={{
-                      marginTop: "8px",
-                      fontSize: "14px",
-                      color: "#9d174d",
-                      cursor: "pointer",
-                      textDecoration: "underline",
+                      padding: "6px",
+                      width: "100%",
+                      marginBottom: "6px",
+                      gap: "10px"
                     }}
-                    onClick={() => setShowPasswordForm(true)}
-                  >
-                    🔐 비밀번호 설정
-                  </p>
-
-                  {showPasswordForm && (
-                    <div style={{ marginTop: "8px" }}>
-                      <input
-                        type="password"
-                        value={newPassword}
-                        onChange={(e) => setNewPassword(e.target.value)}
-                        placeholder="새 비밀번호"
-                        style={{
-                          padding: "6px",
-                          width: "100%",
-                          marginBottom: "6px",
-                        }}
-                      />
-                      <button
-                        onClick={async () => {
-                          try {
-                            const token = localStorage.getItem("accessToken");
-                            const res = await fetch(
-                              `http://localhost:4000/users/groups/${selectedGroup._id}/password`,
-                              {
-                                method: "PATCH",
-                                headers: {
-                                  "Content-Type": "application/json",
-                                  Authorization: `Bearer ${token}`,
-                                },
-                                body: JSON.stringify({ newPassword }),
-                              }
-                            );
-
-                            if (!res.ok) throw new Error("비밀번호 변경 실패");
-
-                            alert("✅ 비밀번호가 변경되었습니다!");
-                            setShowPasswordForm(false);
-                            setNewPassword("");
-                          } catch (err) {
-                            console.error(err);
-                            alert("❌ 비밀번호 변경 실패");
-                          }
-                        }}
-                        style={{ padding: "6px 12px", marginRight: "6px" }}
-                      >
-                        확인
-                      </button>
-                      <button
-                        onClick={() => {
-                          setShowPasswordForm(false);
-                          setNewPassword("");
-                        }}
-                      >
-                        취소
-                      </button>
-                    </div>
-                  )}
-
+                  />
                   <button
-                    onClick={() => handleDeleteGroup(selectedGroup._id)}
-                    style={{ marginTop: "12px", padding: "6px 12px", backgroundColor: "#ef4444", color: "white", border: "none", borderRadius: "6px", cursor: "pointer", width: "100%" }}
-                  >그룹 삭제</button>
-                </>
+                    onClick={async () => {
+                      try {
+                        const token = localStorage.getItem("accessToken");
+                        const res = await fetch(
+                          `http://localhost:4000/users/groups/${selectedGroup._id}/password`,
+                          {
+                            method: "PATCH",
+                            headers: {
+                              "Content-Type": "application/json",
+                              Authorization: `Bearer ${token}`,
+                            },
+                            body: JSON.stringify({ newPassword }),
+                          }
+                        );
+
+                        if (!res.ok) throw new Error("비밀번호 변경 실패");
+
+                        alert("✅ 비밀번호가 변경되었습니다!");
+                        setShowPasswordForm(false);
+                        setNewPassword("");
+                      } catch (err) {
+                        console.error(err);
+                        alert("❌ 비밀번호 변경 실패");
+                      }
+                    }}
+                    style={passwordButtonStyle}
+                  >
+                    확인
+                  </button>
+                  <button
+                    onClick={() => {
+                      setShowPasswordForm(false);
+                      setNewPassword("");
+                    }}
+                    style ={passwordButtonStyle}
+                  >
+                    취소
+                  </button>
+                </div>
               )}
+              <button
+                onClick={() => handleDeleteGroup(selectedGroup._id)}
+                style={{ marginTop: "12px", padding: "6px 12px", backgroundColor: "#f87171", color: "white", border: "none", borderRadius: "6px", cursor: "pointer", width: "100%" }}
+              >그룹 삭제</button>
             </div>
           )}
         </div>
@@ -381,5 +381,28 @@ const addButtonStyle = {
   cursor: "pointer",
   width: "100%",
 };
+
+const passwordButtonStyle = {
+  padding: "4px 10px",
+  border: "2px solid #d94673",  // 릴레터 핑크 테두리
+  borderRadius: "6px",
+  backgroundColor: "#fff",      // 흰 배경
+  color: "#9d174d",             // 릴레터 포인트 텍스트 색
+  cursor: "pointer",
+  fontSize: "13px",
+
+};
+
+const closeButtonStyle = {
+  backgroundColor: "#fff",
+  border: "2px solid #d94673",   // 릴레터 테두리
+  color: "#d94673",              // 릴레터 텍스트 색
+  borderRadius: "6px",
+  fontSize: "16px",
+  padding: "2px 8px",
+  cursor: "pointer",
+  lineHeight: "1",
+};
+
 
 export default Sidebar;

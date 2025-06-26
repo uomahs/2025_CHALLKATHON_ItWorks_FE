@@ -167,7 +167,7 @@ const DiaryByDate = () => {
             top: "50%",
             left: "50%",
             transform: "translate(-50%, -50%)",
-            backgroundColor: "#fff",
+            backgroundColor: "#fde8ec",
             padding: "24px",
             borderRadius: "12px",
             boxShadow: "0 0 10px rgba(0,0,0,0.2)",
@@ -181,9 +181,9 @@ const DiaryByDate = () => {
             value={inputPassword}
             onChange={(e) => setInputPassword(e.target.value)}
             placeholder="그룹 비밀번호"
-            style={{ padding: "8px", marginBottom: "12px", width: "100%" }}
+            style={{ padding: "8px", marginBottom: "12px", width: "100%", boxSizing: "border-box" }}
           />
-          <div>
+          <div sytle ={{display: "flex", justifyContent : "flex-end", gap : "8px", marginTop: "12px"}}>
             <button
               onClick={async () => {
                 try {
@@ -203,7 +203,11 @@ const DiaryByDate = () => {
                   console.error(err);
                 }
               }}
-              style={{ marginRight: "8px" }}
+            
+              style={buttonStyle}
+              onMouseOver={(e) => (e.target.style.backgroundColor = "#f0f0f0")}
+              onMouseOut={(e) => (e.target.style.backgroundColor = "#fff")}
+
             >
               확인
             </button>
@@ -213,6 +217,11 @@ const DiaryByDate = () => {
                 setInputPassword("");
                 setPendingGroupId(null);
               }}
+
+              style={buttonStyle}
+              onMouseOver={(e) => (e.target.style.backgroundColor = "#f0f0f0")}
+              onMouseOut={(e) => (e.target.style.backgroundColor = "#fff")}
+
             >
               취소
             </button>
@@ -292,5 +301,19 @@ const styles = {
     fontWeight: "bold",
   },
 };
+
+const buttonStyle = {
+  padding: "8px 16px",
+  backgroundColor: "#fff",
+  border: "2px solid #d94673",
+  color: "#d94673",
+  borderRadius: "6px",
+  cursor: "pointer",
+  fontWeight: "bold",
+  fontSize: "14px",
+  transition: "background-color 0.2s ease",
+};
+
+
 
 export default DiaryByDate;

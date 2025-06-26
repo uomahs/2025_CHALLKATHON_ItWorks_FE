@@ -10,7 +10,7 @@ function Calendar() {
 
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState(null);
-  const [hoveredIndex, setHoveredIndex] = useState(null); // ✅ hover 상태 관리
+  const [hoveredIndex, setHoveredIndex] = useState(null);
   const [unreadSummary, setUnreadSummary] = useState({});
   const [loading, setLoading] = useState(true);
 
@@ -70,7 +70,9 @@ function Calendar() {
   for (let i = 1; i <= lastDate; i++) dates.push(i);
 
   if (loading) {
-    return <p style={{ textAlign: "center", marginTop: "100px" }}>로딩 중...</p>;
+    return (
+      <p style={{ textAlign: "center", marginTop: "100px" }}>로딩 중...</p>
+    );
   }
 
   return (
@@ -85,7 +87,9 @@ function Calendar() {
           }}
         >
           <NavButton onClick={prevMonth}>⬅</NavButton>
-          <h2 style={{ color: "#000000" }}>{year}년 {month + 1}월</h2>
+          <h2 style={{ color: "#000000" }}>
+            {year}년 {month + 1}월
+          </h2>
           <NavButton onClick={nextMonth}>➡</NavButton>
         </div>
 
@@ -113,20 +117,41 @@ function Calendar() {
           }}
         >
           {dates.map((day, index) => {
-            const formattedDate = `${year}-${String(month + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+            const formattedDate = `${year}-${String(month + 1).padStart(
+              2,
+              "0"
+            )}-${String(day).padStart(2, "0")}`;
             const daySummary = unreadSummary[formattedDate];
             const unreadCount = daySummary?.unreadCount || 0;
             const readCount = daySummary?.readCount || 0;
             const totalCount = daySummary?.totalCount || 0;
 
+            const isFuture =
+              new Date(formattedDate) > new Date().setHours(0, 0, 0, 0);
+
             return (
               <div
                 key={index}
                 onClick={() => {
-                  if (day) {
-                    setSelectedDate({ year, month, day });
-                    navigate(`/diary/${formattedDate}`);
+                  if (!day) return;
+
+                  if (isFuture) {
+                    const tomorrow = new Date(formattedDate);
+                    tomorrow.setDate(tomorrow.getDate() + 1);
+
+                    const year = tomorrow.getFullYear();
+                    const month = String(tomorrow.getMonth() + 1).padStart(
+                      2,
+                      "0"
+                    );
+                    const date = String(tomorrow.getDate()).padStart(2, "0");
+
+                    alert(`${year}년 ${month}월 ${date}일에 만나요!`);
+                    return;
                   }
+
+                  setSelectedDate({ year, month, day });
+                  navigate(`/diary/${formattedDate}`);
                 }}
                 onMouseEnter={() => setHoveredIndex(index)}
                 onMouseLeave={() => setHoveredIndex(null)}
@@ -142,8 +167,6 @@ function Calendar() {
                     : hoveredIndex === index && day
                     ? "2px solid #d94673"
                     : "1px solid #eee",
-                  backgroundColor: isToday(day) ? "#fde8ec" : "#fff",
-                  border: isSelected(day) ? "2px solid #d94673" : "1px solid #eee",
                   borderRadius: "8px",
                   color: day ? "#333" : "transparent",
                   cursor: day ? "pointer" : "default",
@@ -160,18 +183,22 @@ function Calendar() {
                   transition: "all 0.2s ease-in-out",
                 }}
               >
-                <div style={{ fontWeight: "bold", fontSize: "16px" }}>{day || ""}</div>
+                <div style={{ fontWeight: "bold", fontSize: "16px" }}>
+                  {day || ""}
+                </div>
 
                 {day && totalCount > 0 && (
                   <div style={{ fontSize: "15px", paddingBottom: "25px" }}>
-                    {readCount > 0 && (
+                    {readCount > 0 && !isFuture && (
                       <div style={{ color: "#14b8a6" }}>
-                        👀 열람 일기 {readCount}개
+                        ❤️ 열람 일기 {readCount}개
                       </div>
                     )}
                     {unreadCount > 0 && (
-                      <div style={{ color: "#d94673" }}>
-                        💌 미열람 일기 {unreadCount}개
+                      <div style={{ color: isFuture ? "#d94673" : "#d94673" }}>
+                        {isFuture
+                          ? `❓ 곧 만날 일기 ${unreadCount}개`
+                          : `💌 미열람 일기 ${unreadCount}개`}
                       </div>
                     )}
                   </div>

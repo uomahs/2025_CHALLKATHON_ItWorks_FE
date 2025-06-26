@@ -7,8 +7,18 @@ const DiaryByDate = () => {
   const navigate = useNavigate();
   const [groupPreviews, setGroupPreviews] = useState([]);
 
+  const isFutureDate = (dateStr) => {
+    const today = new Date();
+    const target = new Date(dateStr);
+    today.setHours(0, 0, 0, 0);
+    target.setHours(0, 0, 0, 0);
+    return target > today;
+  };
+
   useEffect(() => {
     const fetchData = async () => {
+      if (isFutureDate(date)) return; // 미래일 경우 아예 요청 안 함
+
       try {
         const token = localStorage.getItem("accessToken");
         if (!token) {
@@ -73,6 +83,11 @@ const DiaryByDate = () => {
     return `${year}년 ${month}월 ${day}일`;
   };
 
+  const handleFutureClick = () => {
+    alert(`${formatDate(date)}에 만나요!`);
+    navigate("/");
+  };
+
   return (
     <div
       style={{
@@ -83,46 +98,52 @@ const DiaryByDate = () => {
     >
       <h2 style={styles.dateTitle}>❤️ {formatDate(date)} ❤️</h2>
       <div style={styles.container}>
-        {groupPreviews.map((group) => {
-          const diary = group.entries[0];
-          if (!diary) return null;
+        {isFutureDate(date) ? (
+          <div style={styles.futureBox} onClick={handleFutureClick}>
+            <p style={styles.futureText}>📅 {formatDate(date)}에 만나요!</p>
+          </div>
+        ) : (
+          groupPreviews.map((group) => {
+            const diary = group.entries[0];
+            if (!diary) return null;
 
-          const imageSrc = diary.imageUrl
-            ? diary.imageUrl.startsWith("http")
-              ? `${diary.imageUrl}?t=${new Date().getTime()}`
-              : `http://localhost:4000${diary.imageUrl}`
-            : "/close.png";
+            const imageSrc = diary.imageUrl
+              ? diary.imageUrl.startsWith("http")
+                ? `${diary.imageUrl}?t=${new Date().getTime()}`
+                : `http://localhost:4000${diary.imageUrl}`
+              : "/close.png";
 
-          return (
-            <div
-              key={group.id || group._id}
-              style={styles.groupBox}
-              onClick={() =>
-                navigate(`/diary/group/${group.id || group._id}?date=${date}`) // ✅ 쿼리 파라미터 추가
-              }
-            >
-              <h3 style={styles.groupTitle}>{group.groupName}</h3>
+            return (
+              <div
+                key={group.id || group._id}
+                style={styles.groupBox}
+                onClick={() =>
+                  navigate(`/diary/group/${group.id || group._id}?date=${date}`)
+                }
+              >
+                <h3 style={styles.groupTitle}>{group.groupName}</h3>
 
-              <img
-                src={imageSrc}
-                alt="preview"
-                onError={(e) => {
-                  e.target.onerror = null;
-                  e.target.src = "/close.png";
-                }}
-                style={styles.image}
-              />
+                <img
+                  src={imageSrc}
+                  alt="preview"
+                  onError={(e) => {
+                    e.target.onerror = null;
+                    e.target.src = "/close.png";
+                  }}
+                  style={styles.image}
+                />
 
-              <p style={styles.title}>{diary.previewText}</p>
-              <p style={styles.readBy}>
-                일기를 펼쳐본 사람 👀 :{" "}
-                {diary.readBy?.length > 0
-                  ? diary.readBy.join(", ")
-                  : "아직 없음"}
-              </p>
-            </div>
-          );
-        })}
+                <p style={styles.title}>{diary.previewText}</p>
+                <p style={styles.readBy}>
+                  일기를 펼쳐본 사람 👀 :{" "}
+                  {diary.readBy?.length > 0
+                    ? diary.readBy.join(", ")
+                    : "아직 없음"}
+                </p>
+              </div>
+            );
+          })
+        )}
       </div>
     </div>
   );
@@ -180,6 +201,20 @@ const styles = {
   readBy: {
     fontSize: "16px",
     color: "#6b7280",
+  },
+  futureBox: {
+    backgroundColor: "#ffffff",
+    borderRadius: "16px",
+    padding: "32px",
+    boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+    textAlign: "center",
+    cursor: "pointer",
+    width: "500px",
+  },
+  futureText: {
+    fontSize: "22px",
+    color: "#d94673",
+    fontWeight: "bold",
   },
 };
 

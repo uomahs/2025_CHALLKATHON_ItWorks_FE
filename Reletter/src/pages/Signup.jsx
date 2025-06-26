@@ -102,7 +102,7 @@ const Signup = () => {
   const onSubmit = async (data) => {
     console.log("💡 fetch 요청 데이터:", data);
     try {
-      const response = await fetch("http://localhost:4000/users/create", {
+      const response = await fetch("${process.env.REACT_APP_API_URL}/users/create", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

@@ -16,7 +16,7 @@ const Find = () => {
         if (!token) return;
 
         const res = await axios.get(
-          "http://localhost:4000/users/friends/requests",
+          "${process.env.REACT_APP_API_URL}/users/friends/requests",
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -43,7 +43,8 @@ const Find = () => {
       }
 
       const res = await axios.get(
-        `http://localhost:4000/users/search?keyword=${searchQuery}`,
+        `${process.env.REACT_APP_API_URL}
+/users/search?keyword=${searchQuery}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -71,7 +72,7 @@ const Find = () => {
       }
 
       await axios.post(
-        "http://localhost:4000/users/friends/request",
+        "${process.env.REACT_APP_API_URL}/users/friends/request",
         { targetId: user._id },
         {
           headers: {
@@ -93,7 +94,7 @@ const Find = () => {
       if (!token) return;
 
       await axios.post(
-        "http://localhost:4000/users/friends/accept",
+        "${process.env.REACT_APP_API_URL}/users/friends/accept",
         { requesterId },
         {
           headers: {
@@ -118,7 +119,7 @@ const Find = () => {
       if (!token) return;
 
       await axios.post(
-        "http://localhost:4000/users/friends/reject",
+        "${process.env.REACT_APP_API_URL}/users/friends/reject",
         { requesterId },
         {
           headers: {

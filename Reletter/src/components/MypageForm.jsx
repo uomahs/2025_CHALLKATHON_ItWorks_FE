@@ -11,7 +11,7 @@ const MyPageForm = () => {
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const res = await axios.get("http://localhost:4000/users/info", {
+        const res = await axios.get("${process.env.REACT_APP_API_URL}/users/info", {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
           },
@@ -34,7 +34,7 @@ const MyPageForm = () => {
     const confirm = window.confirm("정말 탈퇴하시겠어요?");
     if (confirm) {
       try {
-        await axios.delete("http://localhost:4000/users/me", {
+        await axios.delete("${process.env.REACT_APP_API_URL}/users/me", {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
           },
@@ -51,7 +51,7 @@ const MyPageForm = () => {
 
   const handleUpdate = async () => {
     try {
-      await axios.patch("http://localhost:4000/users/update", newInfo, {
+      await axios.patch("${process.env.REACT_APP_API_URL}/users/update", newInfo, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
         },

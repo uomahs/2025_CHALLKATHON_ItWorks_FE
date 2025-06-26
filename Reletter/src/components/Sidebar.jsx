@@ -26,7 +26,7 @@ function Sidebar() {
 
     const fetchCurrentUser = async () => {
       try {
-        const res = await fetch("http://localhost:4000/users/me", {
+        const res = await fetch("${process.env.REACT_APP_API_URL}/users/me", {
           headers: { Authorization: `Bearer ${token}` },
         });
         const data = await res.json();
@@ -38,7 +38,7 @@ function Sidebar() {
 
     const fetchFriends = async () => {
       try {
-        const res = await fetch("http://localhost:4000/users/friends/list", {
+        const res = await fetch("${process.env.REACT_APP_API_URL}/users/friends/list", {
           headers: { Authorization: `Bearer ${token}` },
         });
         if (!res.ok) throw new Error("친구 목록 로드 실패");
@@ -51,7 +51,7 @@ function Sidebar() {
 
     const fetchGroups = async () => {
       try {
-        const res = await fetch("http://localhost:4000/users/groups/list", {
+        const res = await fetch("${process.env.REACT_APP_API_URL}/users/groups/list", {
           headers: { Authorization: `Bearer ${token}` },
         });
         if (!res.ok) throw new Error("그룹 목록 로드 실패");
@@ -76,7 +76,7 @@ function Sidebar() {
 
     try {
       const token = localStorage.getItem("accessToken");
-      const res = await fetch(`http://localhost:4000/users/friends/${friendId}`, {
+      const res = await fetch(`${process.env.REACT_APP_API_URL}/users/friends/${friendId}`, {
         method: "DELETE",
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -98,7 +98,7 @@ function Sidebar() {
 
     try {
       const token = localStorage.getItem("accessToken");
-      const res = await fetch(`http://localhost:4000/users/groups/${groupId}/members/${memberId}`, {
+      const res = await fetch(`${process.env.REACT_APP_API_URL}/users/groups/${groupId}/members/${memberId}`, {
         method: "DELETE",
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -123,7 +123,7 @@ function Sidebar() {
 
     try {
       const token = localStorage.getItem("accessToken");
-      const res = await fetch(`http://localhost:4000/users/groups/${groupId}`, {
+      const res = await fetch(`${process.env.REACT_APP_API_URL}/users/groups/${groupId}`, {
         method: "DELETE",
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -261,7 +261,7 @@ function Sidebar() {
                       try {
                         const token = localStorage.getItem("accessToken");
                         const res = await fetch(
-                          `http://localhost:4000/users/groups/${selectedGroup._id}/password`,
+                          `${process.env.REACT_APP_API_URL}/users/groups/${selectedGroup._id}/password`,
                           {
                             method: "PATCH",
                             headers: {

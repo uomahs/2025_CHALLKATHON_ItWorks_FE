@@ -18,7 +18,7 @@ const DiaryEdit = () => {
     const fetchDiary = async () => {
       try {
         const token = localStorage.getItem("accessToken");
-        const res = await axios.get(`http://localhost:4000/diaries/${id}`, {
+        const res = await axios.get(`${process.env.REACT_APP_API_URL}/diaries/${id}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
 
@@ -40,7 +40,7 @@ const DiaryEdit = () => {
     try {
       const token = localStorage.getItem("accessToken");
       await axios.put(
-        `http://localhost:4000/diaries/${id}`,
+        `${process.env.REACT_APP_API_URL}/diaries/${id}`,
         { title, content },
         { headers: { Authorization: `Bearer ${token}` } }
       );

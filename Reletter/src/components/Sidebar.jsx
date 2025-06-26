@@ -6,6 +6,8 @@ function Sidebar() {
   const [friends, setFriends] = useState([]);
   const [selectedFriend, setSelectedFriend] = useState(null);
   const [selectedGroup, setSelectedGroup] = useState(null);
+  const [showPasswordForm, setShowPasswordForm] = useState(false);
+  const [newPassword, setNewPassword] = useState("");
 
   const navigate = useNavigate();
 
@@ -60,6 +62,7 @@ function Sidebar() {
                 onClick={() => {
                   setSelectedFriend(null);
                   setSelectedGroup(group);
+                  setShowPasswordForm(false);
                 }}
               />
             ))
@@ -99,6 +102,8 @@ function Sidebar() {
               onClick={() => {
                 setSelectedFriend(null);
                 setSelectedGroup(null);
+                setShowPasswordForm(false);
+                setNewPassword("");
               }}
             >
               ✖︎
@@ -129,6 +134,73 @@ function Sidebar() {
                   <li key={m.id || m._id}>{m.name}</li>
                 ))}
               </ul>
+
+              <p
+                style={{
+                  marginTop: "8px",
+                  fontSize: "14px",
+                  color: "#9d174d",
+                  cursor: "pointer",
+                  textDecoration: "underline",
+                }}
+                onClick={() => setShowPasswordForm(true)}
+              >
+                🔐 비밀번호 설정
+              </p>
+
+              {showPasswordForm && (
+                <div style={{ marginTop: "8px" }}>
+                  <input
+                    type="password"
+                    value={newPassword}
+                    onChange={(e) => setNewPassword(e.target.value)}
+                    placeholder="새 비밀번호"
+                    style={{
+                      padding: "6px",
+                      width: "100%",
+                      marginBottom: "6px",
+                    }}
+                  />
+                  <button
+                    onClick={async () => {
+                      try {
+                        const token = localStorage.getItem("accessToken");
+                        const res = await fetch(
+                          `http://localhost:4000/users/groups/${selectedGroup._id}/password`,
+                          {
+                            method: "PATCH",
+                            headers: {
+                              "Content-Type": "application/json",
+                              Authorization: `Bearer ${token}`,
+                            },
+                            body: JSON.stringify({ newPassword }),
+                          }
+                        );
+
+                        if (!res.ok) throw new Error("비밀번호 변경 실패");
+
+                        alert("✅ 비밀번호가 변경되었습니다!");
+                        setShowPasswordForm(false);
+                        setNewPassword("");
+                      } catch (err) {
+                        console.error(err);
+                        alert("❌ 비밀번호 변경 실패");
+                      }
+                    }}
+                    style={{ padding: "6px 12px", marginRight: "6px" }}
+                  >
+                    확인
+                  </button>
+                  <button
+                    onClick={() => {
+                      setShowPasswordForm(false);
+                      setNewPassword("");
+                    }}
+                  >
+                    취소
+                  </button>
+                </div>
+              )}
             </div>
           )}
         </div>
@@ -145,6 +217,7 @@ function SidebarItem({ label, onClick }) {
   );
 }
 
+// 스타일 정의
 const sidebarStyle = {
   width: "220px",
   backgroundColor: "#fdf2f8",

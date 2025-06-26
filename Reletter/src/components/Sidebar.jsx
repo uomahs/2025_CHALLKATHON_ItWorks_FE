@@ -8,22 +8,44 @@ function Sidebar() {
   const [selectedGroup, setSelectedGroup] = useState(null);
   const [showPasswordForm, setShowPasswordForm] = useState(false);
   const [newPassword, setNewPassword] = useState("");
+  const [currentUserId, setCurrentUserId] = useState(null);
 
   const navigate = useNavigate();
 
   useEffect(() => {
+    console.log("🟡 currentUserId", currentUserId);
+  }, [currentUserId]);
+  
+  useEffect(() => {
+    console.log("🟣 selectedGroup", selectedGroup);
+  }, [selectedGroup]);
+  
+
+  useEffect(() => {
     const token = localStorage.getItem("accessToken");
+
+    const fetchCurrentUser = async () => {
+      try {
+        const res = await fetch("http://localhost:4000/users/me", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        const data = await res.json();
+        setCurrentUserId(data.id || data._id);
+      } catch (err) {
+        console.error("❌ 사용자 정보 로드 실패:", err);
+      }
+    };
 
     const fetchFriends = async () => {
       try {
         const res = await fetch("http://localhost:4000/users/friends/list", {
           headers: { Authorization: `Bearer ${token}` },
         });
-        if (!res.ok) throw new Error("친구 목록 불러오기 실패");
+        if (!res.ok) throw new Error("친구 목록 로드 실패");
         const data = await res.json();
         setFriends(data);
       } catch (err) {
-        console.error("❌ 친구 목록 로딩 실패:", err);
+        console.error("❌ 친구 목록 로드 실패:", err);
       }
     };
 
@@ -32,20 +54,89 @@ function Sidebar() {
         const res = await fetch("http://localhost:4000/users/groups/list", {
           headers: { Authorization: `Bearer ${token}` },
         });
-        if (!res.ok) throw new Error("그룹 목록 불러오기 실패");
+        if (!res.ok) throw new Error("그룹 목록 로드 실패");
         const data = await res.json();
         setGroups(data);
       } catch (err) {
-        console.error("❌ 그룹 목록 로딩 실패:", err);
+        console.error("❌ 그룹 목록 로드 실패:", err);
       }
     };
 
+    fetchCurrentUser();
     fetchFriends();
     fetchGroups();
   }, []);
 
   const addGroup = () => navigate("/Group");
   const handleFindClick = () => navigate("/findfriend");
+
+  const handleDeleteFriend = async (friendId) => {
+    const confirm = window.confirm("정말로 이 친구를 삭제하시겠습니까?");
+    if (!confirm) return;
+
+    try {
+      const token = localStorage.getItem("accessToken");
+      const res = await fetch(`http://localhost:4000/users/friends/${friendId}`, {
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      if (!res.ok) throw new Error("삭제 실패");
+
+      setFriends(prev => prev.filter(f => f.id !== friendId));
+      setSelectedFriend(null);
+      alert("친구가 삭제되었습니다.");
+    } catch (err) {
+      console.error("❌ 친구 삭제 실패:", err);
+      alert("친구 삭제 중 오류가 발생했습니다.");
+    }
+  };
+
+  const handleRemoveMember = async (groupId, memberId) => {
+    const confirm = window.confirm("정말로 이 구성원을 삭제하시겠습니까?");
+    if (!confirm) return;
+
+    try {
+      const token = localStorage.getItem("accessToken");
+      const res = await fetch(`http://localhost:4000/users/groups/${groupId}/members/${memberId}`, {
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      if (!res.ok) throw new Error("구성원 삭제 실패");
+
+      setSelectedGroup(prev => ({
+        ...prev,
+        members: prev.members.filter(m => String(m._id || m.id) !== String(memberId)),
+      }));
+      alert("구성원이 삭제되었습니다.");
+    } catch (err) {
+      console.error("❌ 구성원 삭제 실패:", err);
+      alert("삭제 중 오류가 발생했습니다.");
+    }
+  };
+
+  const handleDeleteGroup = async (groupId) => {
+    const confirm = window.confirm("이 그룹을 정말로 삭제하시겠습니까?");
+    if (!confirm) return;
+
+    try {
+      const token = localStorage.getItem("accessToken");
+      const res = await fetch(`http://localhost:4000/users/groups/${groupId}`, {
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      if (!res.ok) throw new Error("그룹 삭제 실패");
+
+      setGroups(prev => prev.filter(g => g._id !== groupId));
+      setSelectedGroup(null);
+      alert("그룹이 삭제되었습니다.");
+    } catch (err) {
+      console.error("❌ 그룹 삭제 실패:", err);
+      alert("삭제 중 오류가 발생했습니다.");
+    }
+  };
 
   return (
     <>
@@ -67,9 +158,7 @@ function Sidebar() {
               />
             ))
           )}
-          <button onClick={addGroup} style={addButtonStyle}>
-            + 그룹 추가
-          </button>
+          <button onClick={addGroup} style={addButtonStyle}>+ 그룹 추가</button>
         </div>
 
         <h3 style={{ ...sectionTitle, marginTop: "24px" }}>👥 친구 목록</h3>
@@ -88,9 +177,7 @@ function Sidebar() {
               />
             ))
           )}
-          <button onClick={handleFindClick} style={addButtonStyle}>
-            + 친구 찾기
-          </button>
+          <button onClick={handleFindClick} style={addButtonStyle}>+ 친구 찾기</button>
         </div>
       </aside>
 
@@ -108,30 +195,38 @@ function Sidebar() {
             >
               ✖︎
             </button>
+            <button onClick={() => {
+              setSelectedFriend(null);
+              setSelectedGroup(null);
+            }}>✖︎</button>
           </div>
 
           {selectedFriend && (
             <div>
-              <p>
-                <strong>이름:</strong> {selectedFriend.name}
-              </p>
-              <p>
-                <strong>이메일:</strong> {selectedFriend.email}
-              </p>
+              <p><strong>이름:</strong> {selectedFriend.name}</p>
+              <p><strong>이메일:</strong> {selectedFriend.email}</p>
+              <button
+                style={{ marginTop: "10px", padding: "6px 12px", backgroundColor: "#f87171", color: "white", border: "none", borderRadius: "6px", cursor: "pointer" }}
+                onClick={() => handleDeleteFriend(selectedFriend.id)}
+              >친구 삭제</button>
             </div>
           )}
 
           {selectedGroup && (
             <div>
-              <p>
-                <strong>그룹 이름:</strong> {selectedGroup.name}
-              </p>
-              <p>
-                <strong>구성원:</strong>
-              </p>
+              <p><strong>그룹 이름:</strong> {selectedGroup.name}</p>
+              <p><strong>구성원:</strong></p>
               <ul>
                 {selectedGroup.members?.map((m) => (
-                  <li key={m.id || m._id}>{m.name}</li>
+                  <li key={m._id || m.id} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "4px" }}>
+                    <span>{m.name}</span>
+                    {String(m._id || m.id) !== String(currentUserId) && (
+                      <button
+                        onClick={() => handleRemoveMember(selectedGroup._id, m._id || m.id)}
+                        style={{ background: "#fca5a5", border: "none", borderRadius: "4px", color: "white", padding: "2px 6px", cursor: "pointer", fontSize: "12px" }}
+                      >삭제</button>
+                    )}
+                  </li>
                 ))}
               </ul>
 
@@ -201,6 +296,10 @@ function Sidebar() {
                   </button>
                 </div>
               )}
+              <button
+                onClick={() => handleDeleteGroup(selectedGroup._id)}
+                style={{ marginTop: "12px", padding: "6px 12px", backgroundColor: "#ef4444", color: "white", border: "none", borderRadius: "6px", cursor: "pointer", width: "100%" }}
+              >그룹 삭제</button>
             </div>
           )}
         </div>

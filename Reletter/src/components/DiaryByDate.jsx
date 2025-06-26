@@ -108,6 +108,8 @@ const DiaryByDate = () => {
           </div>
         ) : (
           groupPreviews.map((group) => {
+            console.log("📦 group:", group);
+
             const diary = group.entries[0];
             if (!diary) return null;
 
@@ -124,8 +126,7 @@ const DiaryByDate = () => {
                 key={groupId}
                 style={styles.groupBox}
                 onClick={() => {
-                  // 인증된 그룹이라면 바로 이동
-                  if (localStorage.getItem(`verifiedGroup_${groupId}`) === "true") {
+                  if (!group.hasPassword) {
                     navigate(`/diary/group/${groupId}?date=${date}`);
                   } else {
                     setPendingGroupId(groupId);
@@ -158,7 +159,7 @@ const DiaryByDate = () => {
         )}
       </div>
 
-      {/* ✅ 비밀번호 입력창 모달 */}
+      {/* ✅ 비밀번호 입력 모달 */}
       {showPasswordPrompt && (
         <div
           style={{
@@ -193,7 +194,7 @@ const DiaryByDate = () => {
                     { headers: { Authorization: `Bearer ${token}` } }
                   );
 
-                  localStorage.setItem(`verifiedGroup_${pendingGroupId}`, "true");
+                  // ✅ 인증 후에도 저장 없이 바로 이동
                   setShowPasswordPrompt(false);
                   setInputPassword("");
                   navigate(`/diary/group/${pendingGroupId}?date=${date}`);

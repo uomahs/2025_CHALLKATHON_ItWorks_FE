@@ -7,8 +7,11 @@
     "dev": "vite",
     "build": "vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d build"
   },
+  "homepage": "https://challkathon-official.github.io/2025_CHALLKATHON_ItWorks_BE/",
   "dependencies": {
     "@hookform/resolvers": "^5.1.1",
     "axios": "^1.10.0",

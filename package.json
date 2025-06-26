@@ -1,15 +1,21 @@
 {
   "name": "your-project-name",
   "version": "1.0.0",
-  "dependencies": {
-    "@hookform/resolvers": "^5.1.1",
-    "react-hook-form": "^7.58.1",
-    "react-transition-group": "^4.4.5",
-    "yup": "^1.6.1"
-  },
   "scripts": {
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview"
+  },
+  "dependencies": {
+    "@hookform/resolvers": "^5.1.1",
+    "react-hook-form": "^7.58.1",
+    "react-transition-group": "^4.4.5",
+    "yup": "^1.6.1",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
+  },
+  "devDependencies": {
+    "vite": "^5.2.10",
+    "@vitejs/plugin-react": "^4.2.1"
   }
 }

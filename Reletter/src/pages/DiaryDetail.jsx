@@ -57,20 +57,21 @@ const DiaryDetail = () => {
       // 자동 읽음 처리
       await Promise.all(
         diaries.map((diary) =>
-          axios.post(
-            `http://localhost:4000/diaries/${diary._id}/read`,
-            {},
-            {
-              headers: {
-                Authorization: `Bearer ${token}`,
-              },
-            }
-          ).catch((err) =>
-            console.error(`❌ 일기 ${diary._id} 읽음 처리 실패`, err)
-          )
+          axios
+            .post(
+              `http://localhost:4000/diaries/${diary._id}/read`,
+              {},
+              {
+                headers: {
+                  Authorization: `Bearer ${token}`,
+                },
+              }
+            )
+            .catch((err) =>
+              console.error(`❌ 일기 ${diary._id} 읽음 처리 실패`, err)
+            )
         )
       );
-
     } catch (err) {
       console.error("❌ 그룹 일기 조회 실패:", err);
       alert("일기를 불러오는 데 실패했습니다.");
@@ -128,8 +129,8 @@ const DiaryDetail = () => {
         <h1 style={styles.pageTitle}>📘 {formatDate(date)} </h1>
 
         <p style={styles.summary}>
-          👀 열람 일기 {readCount}개&nbsp;&nbsp;&nbsp;
-          💌 미열람 일기 {unreadCount}개
+          👀 열람 일기 {readCount}개&nbsp;&nbsp;&nbsp; 💌 미열람 일기{" "}
+          {unreadCount}개
         </p>
 
         {diaries.length === 0 ? (

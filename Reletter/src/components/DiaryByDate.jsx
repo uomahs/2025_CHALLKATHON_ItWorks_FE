@@ -11,17 +11,38 @@ const DiaryByDate = () => {
   const [inputPassword, setInputPassword] = useState("");
   const [pendingGroupId, setPendingGroupId] = useState(null);
 
-  const isFutureDate = (dateStr) => {
+  const parseDateToLocal = (dateStr) => {
+    const [year, month, day] = dateStr.split("-").map(Number);
+    return new Date(year, month - 1, day, 0, 0, 0, 0);
+  };
+
+  const isFutureOrTodayDate = (dateStr) => {
     const today = new Date();
-    const target = new Date(dateStr);
     today.setHours(0, 0, 0, 0);
-    target.setHours(0, 0, 0, 0);
-    return target > today;
+    const target = parseDateToLocal(dateStr);
+    return target >= today;
+  };
+
+  const nextDate = (dateStr) => {
+    const d = parseDateToLocal(dateStr);
+    d.setDate(d.getDate() + 1);
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, "0");
+    const day = String(d.getDate()).padStart(2, "0");
+    return `${y}-${m}-${day}`;
+  };
+
+  const formatDate = (dateStr) => {
+    const [year, month, day] = dateStr.split("-");
+    return `${year}년 ${month}월 ${day}일`;
   };
 
   useEffect(() => {
     const fetchData = async () => {
-      if (isFutureDate(date)) return;
+      if (isFutureOrTodayDate(date)) {
+        setGroupPreviews([]);
+        return;
+      }
 
       try {
         const token = localStorage.getItem("accessToken");
@@ -82,34 +103,34 @@ const DiaryByDate = () => {
     fetchData();
   }, [date]);
 
-  const formatDate = (dateStr) => {
-    const [year, month, day] = dateStr.split("-");
-    return `${year}년 ${month}월 ${day}일`;
-  };
-
   const handleFutureClick = () => {
-    alert(`${formatDate(date)}에 만나요!`);
-    navigate("/");
+    const nextDay = nextDate(date);
+    alert(`${formatDate(nextDay)}에 만나요!`);
+    navigate("/main");
   };
 
   return (
     <div
       style={{
         backgroundColor: "#fff0f6",
-        paddingBottom: "132px",
+        paddingBottom: "500px",
         marginTop: "-40px",
       }}
     >
       <h2 style={styles.dateTitle}>❤️ {formatDate(date)} ❤️</h2>
       <div style={styles.container}>
-        {isFutureDate(date) ? (
+        {isFutureOrTodayDate(date) ? (
           <div style={styles.futureBox} onClick={handleFutureClick}>
-            <p style={styles.futureText}>📅 {formatDate(date)}에 만나요!</p>
+            <p style={styles.futureText}>
+              📅 {formatDate(nextDate(date))}에 만나요!
+            </p>
           </div>
+        ) : groupPreviews.length === 0 ? (
+          <p style={{ textAlign: "center", color: "#777", width: "100%" }}>
+            작성된 일기가 없습니다.
+          </p>
         ) : (
           groupPreviews.map((group) => {
-            console.log("📦 group:", group);
-
             const diary = group.entries[0];
             if (!diary) return null;
 
@@ -148,7 +169,7 @@ const DiaryByDate = () => {
 
                 <p style={styles.title}>{diary.previewText}</p>
                 <p style={styles.readBy}>
-                  일기를 펼쳐본 사람 👀 : <br></br>{" "}
+                  일기를 펼쳐본 사람 👀 : <br />
                   {diary.readBy?.length > 0
                     ? diary.readBy.join(", ")
                     : "아직 없음"}
@@ -159,7 +180,6 @@ const DiaryByDate = () => {
         )}
       </div>
 
-      {/* ✅ 비밀번호 입력 모달 */}
       {showPasswordPrompt && (
         <div
           style={{
@@ -194,7 +214,6 @@ const DiaryByDate = () => {
                     { headers: { Authorization: `Bearer ${token}` } }
                   );
 
-                  // ✅ 인증 후에도 저장 없이 바로 이동
                   setShowPasswordPrompt(false);
                   setInputPassword("");
                   navigate(`/diary/group/${pendingGroupId}?date=${date}`);
@@ -287,6 +306,10 @@ const styles = {
     textAlign: "center",
   },
   futureBox: {
+    backgroundColor: "#fff0f6",
+    paddingBottom: "132px",
+    marginTop: "50px",
+    paddingTop: "100px",
     backgroundColor: "#ffffff",
     borderRadius: "16px",
     padding: "32px",

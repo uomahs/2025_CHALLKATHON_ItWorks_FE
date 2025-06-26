@@ -4,9 +4,16 @@ import axios from "axios";
 
 const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
+function parseDateStringToLocalDate(dateStr) {
+  const [year, month, day] = dateStr.split("-").map(Number);
+  return new Date(year, month - 1, day, 0, 0, 0, 0);
+}
+
 function Calendar() {
-  const navigate = useNavigate();
   const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  const navigate = useNavigate();
 
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState(null);
@@ -117,42 +124,37 @@ function Calendar() {
           }}
         >
           {dates.map((day, index) => {
+            if (!day) {
+              return <div key={index} />;
+            }
+
             const formattedDate = `${year}-${String(month + 1).padStart(
               2,
               "0"
             )}-${String(day).padStart(2, "0")}`;
-            const daySummary = unreadSummary[formattedDate];
-            const unreadCount = daySummary?.unreadCount || 0;
-            const readCount = daySummary?.readCount || 0;
-            const totalCount = daySummary?.totalCount || 0;
 
-            const isFuture =
-              new Date(formattedDate) >
-              new Date(new Date().setHours(0, 0, 0, 0));
-            console.log(
-              `📅 ${formattedDate} isFuture: ${isFuture}, unread: ${unreadCount}`
-            );
+            const targetDate = parseDateStringToLocalDate(formattedDate);
+
+            const isFuture = targetDate > today;
+
+            const daySummary = unreadSummary[formattedDate] || {};
+            const unreadCount = daySummary.unreadCount || 0;
+            const readCount = daySummary.readCount || 0;
+            const totalCount = daySummary.totalCount || 0;
 
             return (
               <div
                 key={index}
                 onClick={() => {
-                  if (!day) return;
-
-                  if (totalCount === 0 && isFuture) {
+                  if (totalCount === 0) {
                     alert("작성된 일기가 없습니다.");
                     return;
                   }
 
                   if (isFuture) {
-                    const tomorrow = new Date(formattedDate);
-                    tomorrow.setDate(tomorrow.getDate() + 1);
-
-                    const y = tomorrow.getFullYear();
-                    const m = String(tomorrow.getMonth() + 1).padStart(2, "0");
-                    const d = String(tomorrow.getDate()).padStart(2, "0");
-
-                    alert(`${y}년 ${m}월 ${d}일에 만나요!`);
+                    alert(
+                      "해당 날짜의 일기는 다음 날 0시 이후에 열람할 수 있어요!"
+                    );
                     return;
                   }
 
@@ -165,35 +167,35 @@ function Calendar() {
                   padding: "8px",
                   backgroundColor: isToday(day)
                     ? "#fde8ec"
-                    : hoveredIndex === index && day
+                    : hoveredIndex === index
                     ? "#fde8ec"
                     : "#fff",
                   border: isSelected(day)
                     ? "2px solid #d94673"
-                    : hoveredIndex === index && day
+                    : hoveredIndex === index
                     ? "2px solid #d94673"
                     : "1px solid #eee",
                   borderRadius: "8px",
-                  color: day ? "#333" : "transparent",
-                  cursor: day ? "pointer" : "default",
+                  color: "#333",
+                  cursor: "pointer",
                   position: "relative",
                   display: "flex",
                   flexDirection: "column",
                   justifyContent: "space-between",
                   transform:
-                    hoveredIndex === index && day ? "translateY(-2px)" : "none",
+                    hoveredIndex === index ? "translateY(-2px)" : "none",
                   boxShadow:
-                    hoveredIndex === index && day
+                    hoveredIndex === index
                       ? "0 4px 8px rgba(217, 70, 115, 0.1)"
                       : "none",
                   transition: "all 0.2s ease-in-out",
                 }}
               >
                 <div style={{ fontWeight: "bold", fontSize: "16px" }}>
-                  {day || ""}
+                  {day}
                 </div>
 
-                {day && totalCount > 0 && (
+                {totalCount > 0 && (
                   <div style={{ fontSize: "15px", paddingBottom: "25px" }}>
                     {readCount > 0 && !isFuture && (
                       <div style={{ color: "#14b8a6" }}>
@@ -201,7 +203,7 @@ function Calendar() {
                       </div>
                     )}
                     {unreadCount > 0 && (
-                      <div style={{ color: isFuture ? "#d94673" : "#d94673" }}>
+                      <div style={{ color: "#d94673" }}>
                         {isFuture
                           ? `⭐️ 곧 만날 일기 ${unreadCount}개`
                           : `💌 미열람 일기 ${unreadCount}개`}
@@ -210,7 +212,7 @@ function Calendar() {
                   </div>
                 )}
 
-                {day && totalCount === 0 && (
+                {totalCount === 0 && (
                   <div
                     style={{
                       fontSize: "15px",
